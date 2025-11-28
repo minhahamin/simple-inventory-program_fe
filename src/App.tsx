@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import Tabs from './components/Tabs';
 import ItemsPage from './pages/ItemsPage';
@@ -28,9 +28,68 @@ const pageLabels: Record<PageType, string> = {
   inoutStatus: '입출고현황',
 };
 
+const STORAGE_KEY_TABS = 'inventory_app_tabs';
+const STORAGE_KEY_ACTIVE_TAB = 'inventory_app_active_tab';
+
 function App() {
-  const [tabs, setTabs] = useState<Tab[]>([{ id: 'items', label: '품목정보' }]);
-  const [activeTab, setActiveTab] = useState<PageType>('items');
+  // localStorage에서 초기 상태 복원
+  const getInitialState = (): { tabs: Tab[]; activeTab: PageType } => {
+    try {
+      const savedTabs = localStorage.getItem(STORAGE_KEY_TABS);
+      const savedActiveTab = localStorage.getItem(STORAGE_KEY_ACTIVE_TAB);
+      
+      let restoredTabs: Tab[] = [{ id: 'items', label: '품목정보' }];
+      let restoredActiveTab: PageType = 'items';
+
+      if (savedTabs) {
+        const parsed = JSON.parse(savedTabs) as Tab[];
+        // 유효한 탭인지 확인
+        const validTabs = parsed.filter((tab: Tab) => tab.id in pageLabels) as Tab[];
+        if (validTabs.length > 0) {
+          restoredTabs = validTabs;
+        }
+      }
+
+      if (savedActiveTab && savedActiveTab in pageLabels) {
+        // 활성 탭이 복원된 탭 목록에 있는지 확인
+        const tabExists = restoredTabs.some(tab => tab.id === savedActiveTab);
+        if (tabExists) {
+          restoredActiveTab = savedActiveTab as PageType;
+        } else {
+          // 없으면 첫 번째 탭을 활성 탭으로 설정
+          restoredActiveTab = restoredTabs[0].id;
+        }
+      } else {
+        restoredActiveTab = restoredTabs[0].id;
+      }
+
+      return { tabs: restoredTabs, activeTab: restoredActiveTab };
+    } catch (error) {
+      console.error('Failed to load state from localStorage:', error);
+      return { tabs: [{ id: 'items', label: '품목정보' }], activeTab: 'items' };
+    }
+  };
+
+  const initialState = getInitialState();
+  const [tabs, setTabs] = useState<Tab[]>(initialState.tabs);
+  const [activeTab, setActiveTab] = useState<PageType>(initialState.activeTab);
+
+  // 탭 상태를 localStorage에 저장
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_TABS, JSON.stringify(tabs));
+    } catch (error) {
+      console.error('Failed to save tabs to localStorage:', error);
+    }
+  }, [tabs]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_ACTIVE_TAB, activeTab);
+    } catch (error) {
+      console.error('Failed to save active tab to localStorage:', error);
+    }
+  }, [activeTab]);
 
   const handleNavigate = (page: PageType) => {
     // 이미 열려있는 탭인지 확인
