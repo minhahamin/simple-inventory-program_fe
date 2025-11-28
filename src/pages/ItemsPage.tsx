@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
 import DatePicker from '../components/DatePicker';
+import ConfirmModal from '../components/ConfirmModal';
 
 interface Item {
   id: string;
@@ -46,6 +47,8 @@ const ItemsPage: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchDate, setSearchDate] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<Item, 'id'>>({
     itemCode: '',
     itemName: '',
@@ -127,9 +130,16 @@ const ItemsPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
-      setItems((prev) => prev.filter((item) => item.id !== id));
+    setDeleteTargetId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteTargetId) {
+      setItems((prev) => prev.filter((item) => item.id !== deleteTargetId));
+      setDeleteTargetId(null);
     }
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -391,6 +401,21 @@ const ItemsPage: React.FC = () => {
               </div>
         </form>
       </DraggableModal>
+
+      {/* 삭제 확인 모달 */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="삭제 확인"
+        message="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="취소"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setDeleteTargetId(null);
+        }}
+      />
     </div>
   );
 };

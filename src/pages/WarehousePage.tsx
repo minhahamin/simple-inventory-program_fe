@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
+import ConfirmModal from '../components/ConfirmModal';
 
 interface Warehouse {
   id: string;
@@ -45,6 +46,8 @@ const WarehousePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<Warehouse, 'id'>>({
     warehouseCode: '',
     warehouseName: '',
@@ -128,9 +131,16 @@ const WarehousePage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
-      setWarehouses((prev) => prev.filter((warehouse) => warehouse.id !== id));
+    setDeleteTargetId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteTargetId) {
+      setWarehouses((prev) => prev.filter((warehouse) => warehouse.id !== deleteTargetId));
+      setDeleteTargetId(null);
     }
+    setShowDeleteConfirm(false);
   };
 
 
@@ -427,6 +437,21 @@ const WarehousePage: React.FC = () => {
               </div>
         </form>
       </DraggableModal>
+
+      {/* 삭제 확인 모달 */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="삭제 확인"
+        message="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="취소"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setDeleteTargetId(null);
+        }}
+      />
     </div>
   );
 };

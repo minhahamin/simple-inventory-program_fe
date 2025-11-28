@@ -1,6 +1,7 @@
 import React, { ReactNode, useState, useRef, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import Pagination from './Pagination';
+import ConfirmModal from './ConfirmModal';
 
 interface Column<T> {
   key: string;
@@ -41,6 +42,8 @@ function DataTable<T extends { id?: string }>({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showExcelAlert, setShowExcelAlert] = useState(false);
   const tableRef = useRef<HTMLTableElement>(null);
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
@@ -97,20 +100,22 @@ function DataTable<T extends { id?: string }>({
   // 선택된 항목들 삭제
   const handleDeleteSelected = () => {
     if (!onDelete || selectedItems.size === 0) return;
-    
-    const confirmMessage = `선택된 ${selectedItems.size}개의 항목을 삭제하시겠습니까?`;
-    if (window.confirm(confirmMessage)) {
-      selectedItems.forEach((id) => {
-        onDelete(id);
-      });
-      setSelectedItems(new Set());
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!onDelete) return;
+    selectedItems.forEach((id) => {
+      onDelete(id);
+    });
+    setSelectedItems(new Set());
+    setShowDeleteConfirm(false);
   };
 
   // 엑셀 다운로드 함수
   const handleExportExcel = () => {
     if (data.length === 0) {
-      alert('다운로드할 데이터가 없습니다.');
+      setShowExcelAlert(true);
       return;
     }
 
@@ -474,6 +479,29 @@ function DataTable<T extends { id?: string }>({
         </div>
       )}
       </div>
+
+      {/* 삭제 확인 모달 */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="삭제 확인"
+        message={`선택된 ${selectedItems.size}개의 항목을 삭제하시겠습니까?`}
+        confirmText="삭제"
+        cancelText="취소"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
+
+      {/* 엑셀 다운로드 알림 모달 */}
+      <ConfirmModal
+        isOpen={showExcelAlert}
+        title="알림"
+        message="다운로드할 데이터가 없습니다."
+        confirmText="확인"
+        type="info"
+        onConfirm={() => setShowExcelAlert(false)}
+        onCancel={() => setShowExcelAlert(false)}
+      />
     </div>
   );
 }
