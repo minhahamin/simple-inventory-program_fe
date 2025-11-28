@@ -6,8 +6,7 @@ interface StockStatus {
   itemCode: string;
   itemName: string;
   currentStock: number;
-  minStock: number;
-  maxStock: number;
+  safeStock: number;
   unit: string;
   location: string;
   stockStatus: string;
@@ -22,8 +21,7 @@ const StatusPage: React.FC = () => {
       itemCode: 'ITM-001',
       itemName: '노트북',
       currentStock: 5,
-      minStock: 10,
-      maxStock: 50,
+      safeStock: 10,
       unit: '개',
       location: 'A-1-1',
       stockStatus: '부족',
@@ -35,11 +33,10 @@ const StatusPage: React.FC = () => {
       itemCode: 'ITM-002',
       itemName: '마우스',
       currentStock: 30,
-      minStock: 20,
-      maxStock: 100,
+      safeStock: 20,
       unit: '개',
       location: 'A-1-2',
-      stockStatus: '정상',
+      stockStatus: '안전',
       lastInboundDate: '2024-01-16',
       lastOutboundDate: '2024-01-21',
     },
@@ -48,11 +45,10 @@ const StatusPage: React.FC = () => {
       itemCode: 'ITM-003',
       itemName: '키보드',
       currentStock: 20,
-      minStock: 15,
-      maxStock: 80,
+      safeStock: 15,
       unit: '개',
       location: 'A-1-3',
-      stockStatus: '정상',
+      stockStatus: '안전',
       lastInboundDate: '2024-01-17',
       lastOutboundDate: '2024-01-22',
     },
@@ -61,11 +57,10 @@ const StatusPage: React.FC = () => {
       itemCode: 'ITM-004',
       itemName: '모니터',
       currentStock: 12,
-      minStock: 10,
-      maxStock: 40,
+      safeStock: 10,
       unit: '개',
       location: 'A-2-1',
-      stockStatus: '주의',
+      stockStatus: '안전',
       lastInboundDate: '2024-01-18',
       lastOutboundDate: '2024-01-23',
     },
@@ -74,11 +69,10 @@ const StatusPage: React.FC = () => {
       itemCode: 'ITM-005',
       itemName: '의자',
       currentStock: 10,
-      minStock: 5,
-      maxStock: 30,
+      safeStock: 5,
       unit: '개',
       location: 'B-1-1',
-      stockStatus: '정상',
+      stockStatus: '안전',
       lastInboundDate: '2024-01-19',
       lastOutboundDate: '2024-01-24',
     },
@@ -94,10 +88,9 @@ const StatusPage: React.FC = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const getStockStatus = (current: number, min: number) => {
-    if (current <= min) return '부족';
-    if (current <= min * 1.5) return '주의';
-    return '정상';
+  const getStockStatus = (current: number, safe: number) => {
+    if (current > safe) return '안전';
+    return '부족';
   };
 
   return (
@@ -118,8 +111,7 @@ const StatusPage: React.FC = () => {
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="전체">전체</option>
-            <option value="정상">정상</option>
-            <option value="주의">주의</option>
+            <option value="안전">안전</option>
             <option value="부족">부족</option>
           </select>
         </div>
@@ -148,17 +140,10 @@ const StatusPage: React.FC = () => {
             ),
           },
           {
-            key: 'minStock',
-            label: '최소재고',
+            key: 'safeStock',
+            label: '안전재고',
             render: (item) => (
-              <span className="text-gray-700">{item.minStock.toLocaleString()}</span>
-            ),
-          },
-          {
-            key: 'maxStock',
-            label: '최대재고',
-            render: (item) => (
-              <span className="text-gray-700">{item.maxStock.toLocaleString()}</span>
+              <span className="text-gray-700">{item.safeStock.toLocaleString()}</span>
             ),
           },
           {
@@ -181,15 +166,13 @@ const StatusPage: React.FC = () => {
             key: 'stockStatus',
             label: '재고상태',
             render: (item) => {
-              const stockStatus = getStockStatus(item.currentStock, item.minStock);
+              const stockStatus = getStockStatus(item.currentStock, item.safeStock);
               return (
                 <span
                   className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    stockStatus === '부족'
-                      ? 'bg-red-100 text-red-800'
-                      : stockStatus === '주의'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-green-100 text-green-800'
+                    stockStatus === '안전'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
                   }`}
                 >
                   {stockStatus}
