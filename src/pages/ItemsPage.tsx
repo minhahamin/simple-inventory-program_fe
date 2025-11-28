@@ -16,56 +16,31 @@ interface Item {
 
 const ItemsPage: React.FC = () => {
   const [items, setItems] = useState<Item[]>([
-    {
-      id: '1',
-      itemCode: 'ITM-001',
-      itemName: '노트북',
-      unitPrice: 1200000,
-      unit: '개',
-      category: '전자제품',
-      description: '고성능 노트북 컴퓨터',
-      registeredDate: '2024-01-10',
-    },
-    {
-      id: '2',
-      itemCode: 'ITM-002',
-      itemName: '마우스',
-      unitPrice: 25000,
-      unit: '개',
-      category: '전자제품',
-      description: '무선 마우스',
-      registeredDate: '2024-01-11',
-    },
-    {
-      id: '3',
-      itemCode: 'ITM-003',
-      itemName: '키보드',
-      unitPrice: 85000,
-      unit: '개',
-      category: '전자제품',
-      description: '기계식 키보드',
-      registeredDate: '2024-01-12',
-    },
-    {
-      id: '4',
-      itemCode: 'ITM-004',
-      itemName: '모니터',
-      unitPrice: 350000,
-      unit: '개',
-      category: '전자제품',
-      description: '27인치 4K 모니터',
-      registeredDate: '2024-01-13',
-    },
-    {
-      id: '5',
-      itemCode: 'ITM-005',
-      itemName: '의자',
-      unitPrice: 250000,
-      unit: '개',
-      category: '가구',
-      description: '사무용 의자',
-      registeredDate: '2024-01-14',
-    },
+    { id: '1', itemCode: 'ITM-001', itemName: '노트북', unitPrice: 1200000, unit: '개', category: '전자제품', description: '고성능 노트북 컴퓨터', registeredDate: '2024-01-10' },
+    { id: '2', itemCode: 'ITM-002', itemName: '마우스', unitPrice: 25000, unit: '개', category: '전자제품', description: '무선 마우스', registeredDate: '2024-01-11' },
+    { id: '3', itemCode: 'ITM-003', itemName: '키보드', unitPrice: 85000, unit: '개', category: '전자제품', description: '기계식 키보드', registeredDate: '2024-01-12' },
+    { id: '4', itemCode: 'ITM-004', itemName: '모니터', unitPrice: 350000, unit: '개', category: '전자제품', description: '27인치 4K 모니터', registeredDate: '2024-01-13' },
+    { id: '5', itemCode: 'ITM-005', itemName: '의자', unitPrice: 250000, unit: '개', category: '가구', description: '사무용 의자', registeredDate: '2024-01-14' },
+    { id: '6', itemCode: 'ITM-006', itemName: '책상', unitPrice: 180000, unit: '개', category: '가구', description: '사무용 책상', registeredDate: '2024-01-15' },
+    { id: '7', itemCode: 'ITM-007', itemName: '스피커', unitPrice: 150000, unit: '개', category: '전자제품', description: '블루투스 스피커', registeredDate: '2024-01-16' },
+    { id: '8', itemCode: 'ITM-008', itemName: '헤드셋', unitPrice: 120000, unit: '개', category: '전자제품', description: '무선 헤드셋', registeredDate: '2024-01-17' },
+    { id: '9', itemCode: 'ITM-009', itemName: '웹캠', unitPrice: 80000, unit: '개', category: '전자제품', description: 'HD 웹캠', registeredDate: '2024-01-18' },
+    { id: '10', itemCode: 'ITM-010', itemName: '마이크', unitPrice: 95000, unit: '개', category: '전자제품', description: 'USB 마이크', registeredDate: '2024-01-19' },
+    { id: '11', itemCode: 'ITM-011', itemName: '램프', unitPrice: 45000, unit: '개', category: '가구', description: 'LED 데스크 램프', registeredDate: '2024-01-20' },
+    { id: '12', itemCode: 'ITM-012', itemName: '파일함', unitPrice: 35000, unit: '개', category: '사무용품', description: '서류 보관함', registeredDate: '2024-01-21' },
+    { id: '13', itemCode: 'ITM-013', itemName: '프린터', unitPrice: 450000, unit: '개', category: '전자제품', description: '레이저 프린터', registeredDate: '2024-01-22' },
+    { id: '14', itemCode: 'ITM-014', itemName: '복사기', unitPrice: 1200000, unit: '개', category: '전자제품', description: '다기능 복사기', registeredDate: '2024-01-23' },
+    { id: '15', itemCode: 'ITM-015', itemName: '스캐너', unitPrice: 280000, unit: '개', category: '전자제품', description: '문서 스캐너', registeredDate: '2024-01-24' },
+    { id: '16', itemCode: 'ITM-016', itemName: '서버', unitPrice: 3500000, unit: '개', category: '전자제품', description: '서버 컴퓨터', registeredDate: '2024-01-25' },
+    { id: '17', itemCode: 'ITM-017', itemName: '라우터', unitPrice: 180000, unit: '개', category: '전자제품', description: '무선 라우터', registeredDate: '2024-01-26' },
+    { id: '18', itemCode: 'ITM-018', itemName: '스위치', unitPrice: 250000, unit: '개', category: '전자제품', description: '네트워크 스위치', registeredDate: '2024-01-27' },
+    { id: '19', itemCode: 'ITM-019', itemName: '백업장치', unitPrice: 550000, unit: '개', category: '전자제품', description: '외장 하드디스크', registeredDate: '2024-01-28' },
+    { id: '20', itemCode: 'ITM-020', itemName: 'USB 메모리', unitPrice: 25000, unit: '개', category: '전자제품', description: '64GB USB', registeredDate: '2024-01-29' },
+    { id: '21', itemCode: 'ITM-021', itemName: '마우스패드', unitPrice: 15000, unit: '개', category: '사무용품', description: '게이밍 마우스패드', registeredDate: '2024-01-30' },
+    { id: '22', itemCode: 'ITM-022', itemName: '모니터암', unitPrice: 120000, unit: '개', category: '가구', description: '듀얼 모니터암', registeredDate: '2024-02-01' },
+    { id: '23', itemCode: 'ITM-023', itemName: '케이블', unitPrice: 15000, unit: '개', category: '전자제품', description: 'HDMI 케이블', registeredDate: '2024-02-02' },
+    { id: '24', itemCode: 'ITM-024', itemName: '어댑터', unitPrice: 35000, unit: '개', category: '전자제품', description: 'USB-C 어댑터', registeredDate: '2024-02-03' },
+    { id: '25', itemCode: 'ITM-025', itemName: '충전기', unitPrice: 45000, unit: '개', category: '전자제품', description: '고속 충전기', registeredDate: '2024-02-04' },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -275,6 +250,7 @@ const ItemsPage: React.FC = () => {
         data={filteredItems}
         emptyMessage={items.length === 0 ? '등록된 품목이 없습니다.' : '검색 결과가 없습니다.'}
         keyExtractor={(item) => item.id}
+        fileName="품목정보"
       />
 
       {/* 등록 모달 */}

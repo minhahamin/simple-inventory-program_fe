@@ -15,56 +15,31 @@ interface Permission {
 
 const PermissionPage: React.FC = () => {
   const [permissions, setPermissions] = useState<Permission[]>([
-    {
-      id: '1',
-      userId: 'admin',
-      userName: '관리자',
-      role: '관리자',
-      department: 'IT팀',
-      email: 'admin@company.com',
-      status: '활성',
-      description: '시스템 관리자',
-    },
-    {
-      id: '2',
-      userId: 'user001',
-      userName: '김철수',
-      role: '일반사용자',
-      department: '영업팀',
-      email: 'kim@company.com',
-      status: '활성',
-      description: '영업 담당자',
-    },
-    {
-      id: '3',
-      userId: 'user002',
-      userName: '이영희',
-      role: '일반사용자',
-      department: '구매팀',
-      email: 'lee@company.com',
-      status: '활성',
-      description: '구매 담당자',
-    },
-    {
-      id: '4',
-      userId: 'user003',
-      userName: '박민수',
-      role: '운영자',
-      department: '물류팀',
-      email: 'park@company.com',
-      status: '활성',
-      description: '물류 운영자',
-    },
-    {
-      id: '5',
-      userId: 'user004',
-      userName: '최지영',
-      role: '일반사용자',
-      department: '회계팀',
-      email: 'choi@company.com',
-      status: '비활성',
-      description: '회계 담당자',
-    },
+    { id: '1', userId: 'admin', userName: '관리자', role: '관리자', department: 'IT팀', email: 'admin@company.com', status: '활성', description: '시스템 관리자' },
+    { id: '2', userId: 'user001', userName: '김철수', role: '일반사용자', department: '영업팀', email: 'kim@company.com', status: '활성', description: '영업 담당자' },
+    { id: '3', userId: 'user002', userName: '이영희', role: '일반사용자', department: '구매팀', email: 'lee@company.com', status: '활성', description: '구매 담당자' },
+    { id: '4', userId: 'user003', userName: '박민수', role: '운영자', department: '물류팀', email: 'park@company.com', status: '활성', description: '물류 운영자' },
+    { id: '5', userId: 'user004', userName: '최지영', role: '일반사용자', department: '회계팀', email: 'choi@company.com', status: '비활성', description: '회계 담당자' },
+    { id: '6', userId: 'user005', userName: '정수진', role: '일반사용자', department: '마케팅팀', email: 'jung@company.com', status: '활성', description: '마케팅 담당자' },
+    { id: '7', userId: 'user006', userName: '강호영', role: '운영자', department: '물류팀', email: 'kang@company.com', status: '활성', description: '물류 운영자' },
+    { id: '8', userId: 'user007', userName: '윤서연', role: '일반사용자', department: '인사팀', email: 'yoon@company.com', status: '활성', description: '인사 담당자' },
+    { id: '9', userId: 'user008', userName: '장민호', role: '일반사용자', department: '영업팀', email: 'jang@company.com', status: '활성', description: '영업 담당자' },
+    { id: '10', userId: 'user009', userName: '임지훈', role: '일반사용자', department: '구매팀', email: 'lim@company.com', status: '활성', description: '구매 담당자' },
+    { id: '11', userId: 'user010', userName: '한소영', role: '운영자', department: '물류팀', email: 'han@company.com', status: '활성', description: '물류 운영자' },
+    { id: '12', userId: 'user011', userName: '오준혁', role: '일반사용자', department: '회계팀', email: 'oh@company.com', status: '활성', description: '회계 담당자' },
+    { id: '13', userId: 'user012', userName: '서미래', role: '일반사용자', department: '마케팅팀', email: 'seo@company.com', status: '활성', description: '마케팅 담당자' },
+    { id: '14', userId: 'user013', userName: '신동욱', role: '일반사용자', department: 'IT팀', email: 'shin@company.com', status: '활성', description: 'IT 담당자' },
+    { id: '15', userId: 'user014', userName: '유하늘', role: '일반사용자', department: '영업팀', email: 'yu@company.com', status: '비활성', description: '영업 담당자' },
+    { id: '16', userId: 'user015', userName: '조성민', role: '운영자', department: '물류팀', email: 'cho@company.com', status: '활성', description: '물류 운영자' },
+    { id: '17', userId: 'user016', userName: '허지은', role: '일반사용자', department: '구매팀', email: 'heo@company.com', status: '활성', description: '구매 담당자' },
+    { id: '18', userId: 'user017', userName: '남도현', role: '일반사용자', department: '회계팀', email: 'nam@company.com', status: '활성', description: '회계 담당자' },
+    { id: '19', userId: 'user018', userName: '문수빈', role: '일반사용자', department: '마케팅팀', email: 'moon@company.com', status: '활성', description: '마케팅 담당자' },
+    { id: '20', userId: 'user019', userName: '양태영', role: '일반사용자', department: '인사팀', email: 'yang@company.com', status: '활성', description: '인사 담당자' },
+    { id: '21', userId: 'user020', userName: '배현우', role: '운영자', department: '물류팀', email: 'bae@company.com', status: '활성', description: '물류 운영자' },
+    { id: '22', userId: 'user021', userName: '백지혜', role: '일반사용자', department: '영업팀', email: 'baek@company.com', status: '활성', description: '영업 담당자' },
+    { id: '23', userId: 'user022', userName: '송민재', role: '일반사용자', department: '구매팀', email: 'song@company.com', status: '활성', description: '구매 담당자' },
+    { id: '24', userId: 'user023', userName: '권혜진', role: '일반사용자', department: 'IT팀', email: 'kwon@company.com', status: '활성', description: 'IT 담당자' },
+    { id: '25', userId: 'user024', userName: '황준호', role: '일반사용자', department: '회계팀', email: 'hwang@company.com', status: '비활성', description: '회계 담당자' },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -274,6 +249,7 @@ const PermissionPage: React.FC = () => {
         data={filteredPermissions}
         emptyMessage={permissions.length === 0 ? '등록된 권한정보가 없습니다.' : '검색 결과가 없습니다.'}
         keyExtractor={(item) => item.id}
+        fileName="권한정보"
       />
 
       {/* 등록 모달 */}

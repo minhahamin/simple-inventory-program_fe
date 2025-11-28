@@ -198,6 +198,7 @@ const StatusPage: React.FC = () => {
         data={filteredStatuses}
         emptyMessage={stockStatuses.length === 0 ? '등록된 재고현황이 없습니다.' : '검색 결과가 없습니다.'}
         keyExtractor={(item) => item.id}
+        fileName="재고현황"
       />
     </div>
   );

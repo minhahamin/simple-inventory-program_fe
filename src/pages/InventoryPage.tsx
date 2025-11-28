@@ -17,61 +17,31 @@ interface Inventory {
 
 const InventoryPage: React.FC = () => {
   const [inventories, setInventories] = useState<Inventory[]>([
-    {
-      id: '1',
-      itemCode: 'ITM-001',
-      itemName: '노트북',
-      currentStock: 5,
-      safeStock: 10,
-      unit: '개',
-      location: 'A-1-1',
-      status: '정상',
-      registeredDate: '2024-01-10',
-    },
-    {
-      id: '2',
-      itemCode: 'ITM-002',
-      itemName: '마우스',
-      currentStock: 30,
-      safeStock: 20,
-      unit: '개',
-      location: 'A-1-2',
-      status: '정상',
-      registeredDate: '2024-01-11',
-    },
-    {
-      id: '3',
-      itemCode: 'ITM-003',
-      itemName: '키보드',
-      currentStock: 20,
-      safeStock: 15,
-      unit: '개',
-      location: 'A-1-3',
-      status: '정상',
-      registeredDate: '2024-01-12',
-    },
-    {
-      id: '4',
-      itemCode: 'ITM-004',
-      itemName: '모니터',
-      currentStock: 12,
-      safeStock: 10,
-      unit: '개',
-      location: 'A-2-1',
-      status: '정상',
-      registeredDate: '2024-01-13',
-    },
-    {
-      id: '5',
-      itemCode: 'ITM-005',
-      itemName: '의자',
-      currentStock: 10,
-      safeStock: 5,
-      unit: '개',
-      location: 'B-1-1',
-      status: '정상',
-      registeredDate: '2024-01-14',
-    },
+    { id: '1', itemCode: 'ITM-001', itemName: '노트북', currentStock: 5, safeStock: 10, unit: '개', location: 'A-1-1', status: '정상', registeredDate: '2024-01-10' },
+    { id: '2', itemCode: 'ITM-002', itemName: '마우스', currentStock: 30, safeStock: 20, unit: '개', location: 'A-1-2', status: '정상', registeredDate: '2024-01-11' },
+    { id: '3', itemCode: 'ITM-003', itemName: '키보드', currentStock: 20, safeStock: 15, unit: '개', location: 'A-1-3', status: '정상', registeredDate: '2024-01-12' },
+    { id: '4', itemCode: 'ITM-004', itemName: '모니터', currentStock: 12, safeStock: 10, unit: '개', location: 'A-2-1', status: '정상', registeredDate: '2024-01-13' },
+    { id: '5', itemCode: 'ITM-005', itemName: '의자', currentStock: 10, safeStock: 5, unit: '개', location: 'B-1-1', status: '정상', registeredDate: '2024-01-14' },
+    { id: '6', itemCode: 'ITM-006', itemName: '책상', currentStock: 8, safeStock: 5, unit: '개', location: 'B-1-2', status: '정상', registeredDate: '2024-01-15' },
+    { id: '7', itemCode: 'ITM-007', itemName: '스피커', currentStock: 15, safeStock: 10, unit: '개', location: 'A-2-2', status: '정상', registeredDate: '2024-01-16' },
+    { id: '8', itemCode: 'ITM-008', itemName: '헤드셋', currentStock: 18, safeStock: 15, unit: '개', location: 'A-2-3', status: '정상', registeredDate: '2024-01-17' },
+    { id: '9', itemCode: 'ITM-009', itemName: '웹캠', currentStock: 12, safeStock: 10, unit: '개', location: 'A-3-1', status: '정상', registeredDate: '2024-01-18' },
+    { id: '10', itemCode: 'ITM-010', itemName: '마이크', currentStock: 9, safeStock: 8, unit: '개', location: 'A-3-2', status: '정상', registeredDate: '2024-01-19' },
+    { id: '11', itemCode: 'ITM-011', itemName: '램프', currentStock: 25, safeStock: 20, unit: '개', location: 'B-2-1', status: '정상', registeredDate: '2024-01-20' },
+    { id: '12', itemCode: 'ITM-012', itemName: '파일함', currentStock: 30, safeStock: 25, unit: '개', location: 'B-2-2', status: '정상', registeredDate: '2024-01-21' },
+    { id: '13', itemCode: 'ITM-013', itemName: '프린터', currentStock: 6, safeStock: 5, unit: '개', location: 'C-1-1', status: '정상', registeredDate: '2024-01-22' },
+    { id: '14', itemCode: 'ITM-014', itemName: '복사기', currentStock: 4, safeStock: 3, unit: '개', location: 'C-1-2', status: '정상', registeredDate: '2024-01-23' },
+    { id: '15', itemCode: 'ITM-015', itemName: '스캐너', currentStock: 7, safeStock: 5, unit: '개', location: 'C-1-3', status: '정상', registeredDate: '2024-01-24' },
+    { id: '16', itemCode: 'ITM-016', itemName: '서버', currentStock: 2, safeStock: 2, unit: '개', location: 'C-2-1', status: '정상', registeredDate: '2024-01-25' },
+    { id: '17', itemCode: 'ITM-017', itemName: '라우터', currentStock: 10, safeStock: 8, unit: '개', location: 'C-2-2', status: '정상', registeredDate: '2024-01-26' },
+    { id: '18', itemCode: 'ITM-018', itemName: '스위치', currentStock: 8, safeStock: 6, unit: '개', location: 'C-2-3', status: '정상', registeredDate: '2024-01-27' },
+    { id: '19', itemCode: 'ITM-019', itemName: '백업장치', currentStock: 6, safeStock: 5, unit: '개', location: 'C-3-1', status: '정상', registeredDate: '2024-01-28' },
+    { id: '20', itemCode: 'ITM-020', itemName: 'USB 메모리', currentStock: 70, safeStock: 50, unit: '개', location: 'D-1-1', status: '정상', registeredDate: '2024-01-29' },
+    { id: '21', itemCode: 'ITM-021', itemName: '마우스패드', currentStock: 35, safeStock: 30, unit: '개', location: 'D-1-2', status: '정상', registeredDate: '2024-01-30' },
+    { id: '22', itemCode: 'ITM-022', itemName: '모니터암', currentStock: 12, safeStock: 10, unit: '개', location: 'D-2-1', status: '정상', registeredDate: '2024-02-01' },
+    { id: '23', itemCode: 'ITM-023', itemName: '케이블', currentStock: 40, safeStock: 30, unit: '개', location: 'D-2-2', status: '정상', registeredDate: '2024-02-02' },
+    { id: '24', itemCode: 'ITM-024', itemName: '어댑터', currentStock: 23, safeStock: 20, unit: '개', location: 'D-2-3', status: '정상', registeredDate: '2024-02-03' },
+    { id: '25', itemCode: 'ITM-025', itemName: '충전기', currentStock: 27, safeStock: 25, unit: '개', location: 'D-3-1', status: '정상', registeredDate: '2024-02-04' },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -305,6 +275,7 @@ const InventoryPage: React.FC = () => {
         data={filteredInventories}
         emptyMessage={inventories.length === 0 ? '등록된 재고정보가 없습니다.' : '검색 결과가 없습니다.'}
         keyExtractor={(item) => item.id}
+        fileName="재고정보"
       />
 
       {/* 등록 모달 */}

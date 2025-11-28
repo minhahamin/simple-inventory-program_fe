@@ -1,4 +1,6 @@
 import React, { ReactNode, useState, useRef, useEffect } from 'react';
+import * as XLSX from 'xlsx';
+import Pagination from './Pagination';
 
 interface Column<T> {
   key: string;
@@ -15,6 +17,9 @@ interface DataTableProps<T> {
   emptySearchMessage?: string;
   onDelete?: (id: string) => void;
   keyExtractor: (item: T) => string;
+  itemsPerPage?: number;
+  showPagination?: boolean;
+  fileName?: string; // 엑셀 다운로드 파일명
 }
 
 function DataTable<T extends { id?: string }>({
@@ -24,21 +29,138 @@ function DataTable<T extends { id?: string }>({
   emptySearchMessage = '검색 결과가 없습니다.',
   onDelete,
   keyExtractor,
+  itemsPerPage: initialItemsPerPage = 10,
+  showPagination = true,
+  fileName = '데이터',
 }: DataTableProps<T>) {
   const isEmpty = data.length === 0;
   const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
   const [resizeStartX, setResizeStartX] = useState(0);
   const [resizeStartWidth, setResizeStartWidth] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const tableRef = useRef<HTMLTableElement>(null);
+  const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
-  // 초기 컬럼 너비 설정 (작업 컬럼 제외)
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = showPagination && data.length > itemsPerPage 
+    ? data.slice(startIndex, endIndex) 
+    : data;
+
+  // 데이터가 변경되면 첫 페이지로 리셋
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data.length]);
+
+  // itemsPerPage가 변경되면 첫 페이지로 리셋
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // 페이지 변경 시 테이블 상단으로 스크롤
+    if (tableRef.current) {
+      tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // 체크박스 관련 함수
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(paginatedData.map(item => keyExtractor(item)));
+      setSelectedItems(allIds);
+    } else {
+      setSelectedItems(new Set());
+    }
+  };
+
+  const handleSelectItem = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedItems);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  const isAllSelected = paginatedData.length > 0 && paginatedData.every(item => selectedItems.has(keyExtractor(item)));
+  const isIndeterminate = paginatedData.some(item => selectedItems.has(keyExtractor(item))) && !isAllSelected;
+
+  // 엑셀 다운로드 함수
+  const handleExportExcel = () => {
+    if (data.length === 0) {
+      alert('다운로드할 데이터가 없습니다.');
+      return;
+    }
+
+    // 헤더 생성 (체크박스, 행번호, 작업 컬럼 제외)
+    const headers = columns
+      .filter(col => col.key !== 'checkbox' && col.key !== 'rowNumber' && col.key !== 'actions')
+      .map(col => col.label);
+
+    // 데이터 행 생성
+    const rows = data.map(item => {
+      return columns
+        .filter(col => col.key !== 'checkbox' && col.key !== 'rowNumber' && col.key !== 'actions')
+        .map(col => {
+          // 숫자 타입 필드는 render 함수가 있어도 원본 숫자 값 사용
+          const originalValue = (item as any)[col.key];
+          if (typeof originalValue === 'number') {
+            return originalValue;
+          }
+          
+          if (col.render) {
+            // render 함수가 있으면 텍스트만 추출 (HTML 제거)
+            const rendered = col.render(item);
+            if (typeof rendered === 'string') {
+              return rendered;
+            } else if (React.isValidElement(rendered)) {
+              // React 요소인 경우 텍스트 추출
+              const props = rendered.props as { children?: ReactNode };
+              return props?.children || '';
+            }
+            return '';
+          }
+          return originalValue || '';
+        });
+    });
+
+    // 워크북 생성
+    const worksheetData = [headers, ...rows];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // 컬럼 너비 설정
+    const columnWidths = columns
+      .filter(col => col.key !== 'checkbox' && col.key !== 'rowNumber' && col.key !== 'actions')
+      .map(col => ({ wch: Math.max(col.label.length, 15) }));
+    worksheet['!cols'] = columnWidths;
+
+    // 워크북 생성 및 다운로드
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // 파일명 생성 (현재 날짜 포함)
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    const downloadFileName = `${fileName}_${dateStr}.xlsx`;
+
+    XLSX.writeFile(workbook, downloadFileName);
+  };
+
+  // 초기 컬럼 너비 설정 (체크박스, 행번호, 작업 컬럼 제외)
   useEffect(() => {
     if (columns.length > 0 && Object.keys(columnWidths).length === 0) {
       const initialWidths: { [key: string]: number } = {};
       columns.forEach((col) => {
-        if (col.key !== 'actions') {
-          initialWidths[col.key] = 150; // 기본 너비 (작업 컬럼은 제외)
+        if (col.key !== 'actions' && col.key !== 'checkbox' && col.key !== 'rowNumber') {
+          initialWidths[col.key] = 150; // 기본 너비
         }
       });
       setColumnWidths(initialWidths);
@@ -46,7 +168,7 @@ function DataTable<T extends { id?: string }>({
   }, [columns, columnWidths]);
 
   const handleResizeStart = (e: React.MouseEvent, columnKey: string) => {
-    if (columnKey === 'actions') return; // 작업 컬럼은 리사이징 불가
+    if (columnKey === 'actions' || columnKey === 'checkbox' || columnKey === 'rowNumber') return; // 작업, 체크박스, 행번호 컬럼은 리사이징 불가
     e.preventDefault();
     e.stopPropagation();
     setResizingColumn(columnKey);
@@ -82,11 +204,65 @@ function DataTable<T extends { id?: string }>({
   }, [resizingColumn, resizeStartX, resizeStartWidth]);
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-      <div className="overflow-x-auto">
+    <div className="flex flex-col gap-3">
+      {/* 엑셀 다운로드 버튼 */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleExportExcel}
+          disabled={data.length === 0}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+            data.length === 0
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
+          }`}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <span>엑셀 다운로드</span>
+        </button>
+      </div>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 flex flex-col" style={{ height: '600px' }}>
+        <div className="overflow-x-auto flex-1 overflow-y-auto relative">
         <table ref={tableRef} className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: '100%', minWidth: 'max-content' }}>
-          <thead className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 shadow-md">
+          <thead className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 shadow-md sticky top-0 z-30">
             <tr>
+              {/* 체크박스 컬럼 */}
+              <th
+                className="relative px-4 py-4 whitespace-nowrap text-center text-xs font-bold text-white uppercase tracking-wider border-r border-blue-400/30 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600"
+                style={{ width: '60px', minWidth: '60px', maxWidth: '60px' }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isAllSelected}
+                  ref={(input) => {
+                    if (input) input.indeterminate = isIndeterminate;
+                  }}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                />
+              </th>
+              {/* 행번호 컬럼 */}
+              <th
+                className="relative px-4 py-4 whitespace-nowrap text-center text-xs font-bold text-white uppercase tracking-wider border-r border-blue-400/30 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600"
+                style={{ width: '80px', minWidth: '80px', maxWidth: '80px' }}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-1 h-4 bg-white/30 rounded-full"></div>
+                  <span className="text-white drop-shadow-sm">번호</span>
+                </div>
+              </th>
               {columns.map((column, index) => {
                 const isActionsColumn = column.key === 'actions';
                 return (
@@ -97,7 +273,7 @@ function DataTable<T extends { id?: string }>({
                     } ${
                       column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left'
                     } ${column.className || ''} ${
-                      isActionsColumn ? 'sticky right-0 z-20 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600' : ''
+                      isActionsColumn ? 'sticky right-0 z-40 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600' : ''
                     }`}
                     style={{ 
                       width: `${isActionsColumn ? 150 : (columnWidths[column.key] || 150)}px`,
@@ -106,7 +282,7 @@ function DataTable<T extends { id?: string }>({
                       ...(isActionsColumn ? { 
                         position: 'sticky',
                         right: 0,
-                        zIndex: 20,
+                        zIndex: 40,
                         willChange: 'auto',
                       } : {})
                     }}
@@ -129,10 +305,10 @@ function DataTable<T extends { id?: string }>({
               })}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody ref={tbodyRef} className="bg-white divide-y divide-gray-100">
             {isEmpty ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-16">
+                <td colSpan={columns.length + 2} className="px-6 py-16">
                   <div className="flex flex-col items-center justify-center py-12">
                     <svg
                       className="w-16 h-16 text-gray-300 mb-4"
@@ -154,13 +330,44 @@ function DataTable<T extends { id?: string }>({
                 </td>
               </tr>
             ) : (
-              data.map((item, index) => {
+              paginatedData.map((item, index) => {
                 const isEvenRow = index % 2 === 0;
+                const itemId = keyExtractor(item);
+                const rowNumber = startIndex + index + 1;
+                const isSelected = selectedItems.has(itemId);
                 return (
                   <tr
-                    key={keyExtractor(item)}
-                    className="group border-b border-gray-100"
+                    key={itemId}
+                    className={`group border-b border-gray-100 ${isSelected ? 'bg-blue-50' : ''} cursor-pointer`}
+                    onClick={() => handleSelectItem(itemId, !isSelected)}
                   >
+                    {/* 체크박스 컬럼 */}
+                    <td
+                      className={`px-4 py-4 whitespace-nowrap text-center transition-colors duration-150 ${
+                        isEvenRow ? 'bg-white' : 'bg-gray-50/50'
+                      } ${isSelected ? 'bg-blue-50' : ''} group-hover:bg-blue-50`}
+                      style={{ width: '60px', minWidth: '60px', maxWidth: '60px' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleSelectItem(itemId, e.target.checked);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                      />
+                    </td>
+                    {/* 행번호 컬럼 */}
+                    <td
+                      className={`px-4 py-4 whitespace-nowrap text-center text-sm text-gray-700 transition-colors duration-150 ${
+                        isEvenRow ? 'bg-white' : 'bg-gray-50/50'
+                      } ${isSelected ? 'bg-blue-50' : ''} group-hover:bg-blue-50`}
+                      style={{ width: '80px', minWidth: '80px', maxWidth: '80px' }}
+                    >
+                      {rowNumber}
+                    </td>
                     {columns.map((column, colIndex) => {
                       const isActionsColumn = column.key === 'actions';
                       return (
@@ -176,7 +383,7 @@ function DataTable<T extends { id?: string }>({
                             isActionsColumn 
                               ? `sticky right-0 z-10 bg-white group-hover:bg-blue-50` 
                               : `${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} group-hover:bg-blue-50`
-                          }`}
+                          } ${isSelected ? 'bg-blue-50' : ''}`}
                           style={{ 
                             width: `${isActionsColumn ? 150 : (columnWidths[column.key] || 150)}px`,
                             minWidth: isActionsColumn ? '150px' : '80px',
@@ -203,6 +410,33 @@ function DataTable<T extends { id?: string }>({
             )}
           </tbody>
         </table>
+      </div>
+      {showPagination && (
+        <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-700">페이지당 항목 수:</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value={5}>5개</option>
+              <option value={10}>10개</option>
+              <option value={20}>20개</option>
+              <option value={100}>100개</option>
+            </select>
+          </div>
+          {data.length > itemsPerPage && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              totalItems={data.length}
+            />
+          )}
+        </div>
+      )}
       </div>
     </div>
   );

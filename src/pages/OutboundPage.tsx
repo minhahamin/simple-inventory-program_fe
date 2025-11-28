@@ -16,56 +16,31 @@ interface Outbound {
 
 const OutboundPage: React.FC = () => {
   const [outbounds, setOutbounds] = useState<Outbound[]>([
-    {
-      id: '1',
-      outboundDate: '2024-01-20',
-      itemCode: 'ITM-001',
-      itemName: '노트북',
-      quantity: 5,
-      unitPrice: 1200000,
-      customer: 'ABC회사',
-      memo: '주문 출고',
-    },
-    {
-      id: '2',
-      outboundDate: '2024-01-21',
-      itemCode: 'ITM-002',
-      itemName: '마우스',
-      quantity: 20,
-      unitPrice: 25000,
-      customer: 'XYZ회사',
-      memo: '정기 출고',
-    },
-    {
-      id: '3',
-      outboundDate: '2024-01-22',
-      itemCode: 'ITM-003',
-      itemName: '키보드',
-      quantity: 10,
-      unitPrice: 85000,
-      customer: 'DEF회사',
-      memo: '주문 출고',
-    },
-    {
-      id: '4',
-      outboundDate: '2024-01-23',
-      itemCode: 'ITM-004',
-      itemName: '모니터',
-      quantity: 8,
-      unitPrice: 350000,
-      customer: 'GHI회사',
-      memo: '정기 출고',
-    },
-    {
-      id: '5',
-      outboundDate: '2024-01-24',
-      itemCode: 'ITM-005',
-      itemName: '의자',
-      quantity: 5,
-      unitPrice: 250000,
-      customer: 'JKL회사',
-      memo: '주문 출고',
-    },
+    { id: '1', outboundDate: '2024-01-20', itemCode: 'ITM-001', itemName: '노트북', quantity: 5, unitPrice: 1200000, customer: 'ABC회사', memo: '주문 출고' },
+    { id: '2', outboundDate: '2024-01-21', itemCode: 'ITM-002', itemName: '마우스', quantity: 20, unitPrice: 25000, customer: 'XYZ회사', memo: '정기 출고' },
+    { id: '3', outboundDate: '2024-01-22', itemCode: 'ITM-003', itemName: '키보드', quantity: 10, unitPrice: 85000, customer: 'DEF회사', memo: '주문 출고' },
+    { id: '4', outboundDate: '2024-01-23', itemCode: 'ITM-004', itemName: '모니터', quantity: 8, unitPrice: 350000, customer: 'GHI회사', memo: '정기 출고' },
+    { id: '5', outboundDate: '2024-01-24', itemCode: 'ITM-005', itemName: '의자', quantity: 5, unitPrice: 250000, customer: 'JKL회사', memo: '주문 출고' },
+    { id: '6', outboundDate: '2024-01-25', itemCode: 'ITM-006', itemName: '책상', quantity: 3, unitPrice: 180000, customer: 'MNO회사', memo: '정기 출고' },
+    { id: '7', outboundDate: '2024-01-26', itemCode: 'ITM-007', itemName: '스피커', quantity: 8, unitPrice: 150000, customer: 'PQR회사', memo: '주문 출고' },
+    { id: '8', outboundDate: '2024-01-27', itemCode: 'ITM-008', itemName: '헤드셋', quantity: 12, unitPrice: 120000, customer: 'STU회사', memo: '정기 출고' },
+    { id: '9', outboundDate: '2024-01-28', itemCode: 'ITM-009', itemName: '웹캠', quantity: 6, unitPrice: 80000, customer: 'VWX회사', memo: '주문 출고' },
+    { id: '10', outboundDate: '2024-01-29', itemCode: 'ITM-010', itemName: '마이크', quantity: 4, unitPrice: 95000, customer: 'YZA회사', memo: '정기 출고' },
+    { id: '11', outboundDate: '2024-01-30', itemCode: 'ITM-011', itemName: '램프', quantity: 15, unitPrice: 45000, customer: 'BCD회사', memo: '주문 출고' },
+    { id: '12', outboundDate: '2024-02-01', itemCode: 'ITM-012', itemName: '파일함', quantity: 20, unitPrice: 35000, customer: 'EFG회사', memo: '정기 출고' },
+    { id: '13', outboundDate: '2024-02-02', itemCode: 'ITM-013', itemName: '프린터', quantity: 2, unitPrice: 450000, customer: 'HIJ회사', memo: '주문 출고' },
+    { id: '14', outboundDate: '2024-02-03', itemCode: 'ITM-014', itemName: '복사기', quantity: 1, unitPrice: 1200000, customer: 'KLM회사', memo: '정기 출고' },
+    { id: '15', outboundDate: '2024-02-04', itemCode: 'ITM-015', itemName: '스캐너', quantity: 3, unitPrice: 280000, customer: 'NOP회사', memo: '주문 출고' },
+    { id: '16', outboundDate: '2024-02-05', itemCode: 'ITM-016', itemName: '서버', quantity: 1, unitPrice: 3500000, customer: 'QRS회사', memo: '정기 출고' },
+    { id: '17', outboundDate: '2024-02-06', itemCode: 'ITM-017', itemName: '라우터', quantity: 5, unitPrice: 180000, customer: 'TUV회사', memo: '주문 출고' },
+    { id: '18', outboundDate: '2024-02-07', itemCode: 'ITM-018', itemName: '스위치', quantity: 4, unitPrice: 250000, customer: 'WXY회사', memo: '정기 출고' },
+    { id: '19', outboundDate: '2024-02-08', itemCode: 'ITM-019', itemName: '백업장치', quantity: 2, unitPrice: 550000, customer: 'ZAB회사', memo: '주문 출고' },
+    { id: '20', outboundDate: '2024-02-09', itemCode: 'ITM-020', itemName: 'USB 메모리', quantity: 30, unitPrice: 25000, customer: 'CDE회사', memo: '정기 출고' },
+    { id: '21', outboundDate: '2024-02-10', itemCode: 'ITM-021', itemName: '마우스패드', quantity: 25, unitPrice: 15000, customer: 'FGH회사', memo: '주문 출고' },
+    { id: '22', outboundDate: '2024-02-11', itemCode: 'ITM-022', itemName: '모니터암', quantity: 6, unitPrice: 120000, customer: 'IJK회사', memo: '정기 출고' },
+    { id: '23', outboundDate: '2024-02-12', itemCode: 'ITM-023', itemName: '케이블', quantity: 40, unitPrice: 15000, customer: 'LMN회사', memo: '주문 출고' },
+    { id: '24', outboundDate: '2024-02-13', itemCode: 'ITM-024', itemName: '어댑터', quantity: 12, unitPrice: 35000, customer: 'OPQ회사', memo: '정기 출고' },
+    { id: '25', outboundDate: '2024-02-14', itemCode: 'ITM-025', itemName: '충전기', quantity: 18, unitPrice: 45000, customer: 'RST회사', memo: '주문 출고' },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -273,6 +248,7 @@ const OutboundPage: React.FC = () => {
         data={filteredOutbounds}
         emptyMessage={outbounds.length === 0 ? '등록된 출고정보가 없습니다.' : '검색 결과가 없습니다.'}
         keyExtractor={(item) => item.id}
+        fileName="출고정보"
       />
 
       {/* 등록 모달 */}
