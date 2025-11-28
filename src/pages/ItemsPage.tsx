@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
+import DatePicker from '../components/DatePicker';
 
 interface Item {
   id: string;
@@ -10,6 +11,7 @@ interface Item {
   unit: string;
   category: string;
   description: string;
+  registeredDate: string;
 }
 
 const ItemsPage: React.FC = () => {
@@ -22,6 +24,7 @@ const ItemsPage: React.FC = () => {
       unit: '개',
       category: '전자제품',
       description: '고성능 노트북 컴퓨터',
+      registeredDate: '2024-01-10',
     },
     {
       id: '2',
@@ -31,6 +34,7 @@ const ItemsPage: React.FC = () => {
       unit: '개',
       category: '전자제품',
       description: '무선 마우스',
+      registeredDate: '2024-01-11',
     },
     {
       id: '3',
@@ -40,6 +44,7 @@ const ItemsPage: React.FC = () => {
       unit: '개',
       category: '전자제품',
       description: '기계식 키보드',
+      registeredDate: '2024-01-12',
     },
     {
       id: '4',
@@ -49,6 +54,7 @@ const ItemsPage: React.FC = () => {
       unit: '개',
       category: '전자제품',
       description: '27인치 4K 모니터',
+      registeredDate: '2024-01-13',
     },
     {
       id: '5',
@@ -58,11 +64,13 @@ const ItemsPage: React.FC = () => {
       unit: '개',
       category: '가구',
       description: '사무용 의자',
+      registeredDate: '2024-01-14',
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchDate, setSearchDate] = useState('');
   const [formData, setFormData] = useState<Omit<Item, 'id'>>({
     itemCode: '',
     itemName: '',
@@ -70,6 +78,7 @@ const ItemsPage: React.FC = () => {
     unit: '',
     category: '',
     description: '',
+    registeredDate: '',
   });
 
   const filteredItems = items.filter((item) => {
@@ -77,7 +86,8 @@ const ItemsPage: React.FC = () => {
       item.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.category.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesDate = !searchDate || item.registeredDate === searchDate;
+    return matchesSearch && matchesDate;
   });
 
   const handleOpenModal = () => {
@@ -96,6 +106,7 @@ const ItemsPage: React.FC = () => {
         unit: item.unit,
         category: item.category,
         description: item.description,
+        registeredDate: item.registeredDate,
       });
       setIsModalOpen(true);
     }
@@ -111,6 +122,7 @@ const ItemsPage: React.FC = () => {
       unit: '',
       category: '',
       description: '',
+      registeredDate: '',
     });
   };
 
@@ -156,6 +168,12 @@ const ItemsPage: React.FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <DatePicker
+            value={searchDate}
+            onChange={setSearchDate}
+            placeholder="등록일 검색"
+            className="w-48"
           />
           <button
             onClick={handleOpenModal}
@@ -223,6 +241,13 @@ const ItemsPage: React.FC = () => {
             label: '설명',
             render: (item) => (
               <span className="text-gray-600 max-w-xs truncate block">{item.description || '-'}</span>
+            ),
+          },
+          {
+            key: 'registeredDate',
+            label: '등록일',
+            render: (item) => (
+              <span className="text-gray-700">{item.registeredDate}</span>
             ),
           },
           {
@@ -347,19 +372,30 @@ const ItemsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  설명
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="품목에 대한 설명을 입력하세요"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    설명
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="품목에 대한 설명을 입력하세요"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    등록일 <span className="text-red-500">*</span>
+                  </label>
+                  <DatePicker
+                    value={formData.registeredDate}
+                    onChange={(date) => setFormData((prev) => ({ ...prev, registeredDate: date }))}
+                    required
+                  />
+                </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                 <button

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
+import DatePicker from '../components/DatePicker';
 
 interface Inventory {
   id: string;
@@ -11,6 +12,7 @@ interface Inventory {
   unit: string;
   location: string;
   status: string;
+  registeredDate: string;
 }
 
 const InventoryPage: React.FC = () => {
@@ -24,6 +26,7 @@ const InventoryPage: React.FC = () => {
       unit: '개',
       location: 'A-1-1',
       status: '정상',
+      registeredDate: '2024-01-10',
     },
     {
       id: '2',
@@ -34,6 +37,7 @@ const InventoryPage: React.FC = () => {
       unit: '개',
       location: 'A-1-2',
       status: '정상',
+      registeredDate: '2024-01-11',
     },
     {
       id: '3',
@@ -44,6 +48,7 @@ const InventoryPage: React.FC = () => {
       unit: '개',
       location: 'A-1-3',
       status: '정상',
+      registeredDate: '2024-01-12',
     },
     {
       id: '4',
@@ -54,6 +59,7 @@ const InventoryPage: React.FC = () => {
       unit: '개',
       location: 'A-2-1',
       status: '정상',
+      registeredDate: '2024-01-13',
     },
     {
       id: '5',
@@ -64,11 +70,13 @@ const InventoryPage: React.FC = () => {
       unit: '개',
       location: 'B-1-1',
       status: '정상',
+      registeredDate: '2024-01-14',
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchDate, setSearchDate] = useState('');
   const [formData, setFormData] = useState<Omit<Inventory, 'id'>>({
     itemCode: '',
     itemName: '',
@@ -77,6 +85,7 @@ const InventoryPage: React.FC = () => {
     unit: '',
     location: '',
     status: '정상',
+    registeredDate: '',
   });
 
   const filteredInventories = inventories.filter((inventory) => {
@@ -84,7 +93,8 @@ const InventoryPage: React.FC = () => {
       inventory.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inventory.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inventory.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesDate = !searchDate || inventory.registeredDate === searchDate;
+    return matchesSearch && matchesDate;
   });
 
   const handleOpenModal = () => {
@@ -104,6 +114,7 @@ const InventoryPage: React.FC = () => {
         unit: inventory.unit,
         location: inventory.location,
         status: inventory.status,
+        registeredDate: inventory.registeredDate,
       });
       setIsModalOpen(true);
     }
@@ -120,6 +131,7 @@ const InventoryPage: React.FC = () => {
       unit: '',
       location: '',
       status: '정상',
+      registeredDate: '',
     });
   };
 
@@ -170,6 +182,12 @@ const InventoryPage: React.FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <DatePicker
+            value={searchDate}
+            onChange={setSearchDate}
+            placeholder="등록일 검색"
+            className="w-48"
           />
           <button
             onClick={handleOpenModal}
@@ -254,6 +272,13 @@ const InventoryPage: React.FC = () => {
                 </span>
               );
             },
+          },
+          {
+            key: 'registeredDate',
+            label: '등록일',
+            render: (item) => (
+              <span className="text-gray-700">{item.registeredDate}</span>
+            ),
           },
           {
             key: 'actions',
@@ -408,6 +433,17 @@ const InventoryPage: React.FC = () => {
                     <option value="보관중">보관중</option>
                     <option value="폐기">폐기</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    등록일 <span className="text-red-500">*</span>
+                  </label>
+                  <DatePicker
+                    value={formData.registeredDate}
+                    onChange={(date) => setFormData((prev) => ({ ...prev, registeredDate: date }))}
+                    required
+                  />
                 </div>
               </div>
 
