@@ -274,6 +274,7 @@ const InventoryPage: React.FC = () => {
         ]}
         data={filteredInventories}
         emptyMessage={inventories.length === 0 ? '등록된 재고정보가 없습니다.' : '검색 결과가 없습니다.'}
+        onDelete={handleDelete}
         keyExtractor={(item) => item.id}
         fileName="재고정보"
       />

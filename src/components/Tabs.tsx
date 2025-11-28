@@ -17,12 +17,12 @@ interface TabsProps {
 const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, onTabClose }) => {
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-5 lg:px-6">
+        <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
             <div
               key={tab.id}
-              className={`group relative flex items-center gap-2 px-4 py-3 cursor-pointer border-b-2 transition-all duration-200 ${
+              className={`group relative flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 cursor-pointer border-b-2 transition-all duration-200 flex-shrink-0 ${
                 activeTab === tab.id
                   ? 'border-blue-600 bg-blue-50'
                   : 'border-transparent hover:border-gray-300 hover:bg-gray-50'
@@ -30,7 +30,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, onTabClose }) 
               onClick={() => onTabClick(tab.id)}
             >
               <span
-                className={`text-sm font-medium whitespace-nowrap ${
+                className={`text-xs sm:text-sm font-medium whitespace-nowrap ${
                   activeTab === tab.id ? 'text-blue-600' : 'text-gray-600'
                 }`}
               >
@@ -41,14 +41,14 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, onTabClose }) 
                   e.stopPropagation();
                   onTabClose(tab.id);
                 }}
-                className={`ml-1 p-1 rounded-full transition-colors ${
+                className={`ml-0.5 sm:ml-1 p-0.5 sm:p-1 rounded-full transition-colors flex-shrink-0 ${
                   activeTab === tab.id
                     ? 'text-blue-600 hover:bg-blue-200'
                     : 'text-gray-400 hover:bg-gray-200 hover:text-gray-600'
                 }`}
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-3 h-3 sm:w-4 sm:h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

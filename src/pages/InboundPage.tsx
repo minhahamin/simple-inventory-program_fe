@@ -247,6 +247,7 @@ const InboundPage: React.FC = () => {
         ]}
         data={filteredInbounds}
         emptyMessage={inbounds.length === 0 ? '등록된 입고정보가 없습니다.' : '검색 결과가 없습니다.'}
+        onDelete={handleDelete}
         keyExtractor={(item) => item.id}
         fileName="입고정보"
       />

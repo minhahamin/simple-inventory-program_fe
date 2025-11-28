@@ -249,6 +249,7 @@ const ItemsPage: React.FC = () => {
         ]}
         data={filteredItems}
         emptyMessage={items.length === 0 ? '등록된 품목이 없습니다.' : '검색 결과가 없습니다.'}
+        onDelete={handleDelete}
         keyExtractor={(item) => item.id}
         fileName="품목정보"
       />

@@ -248,6 +248,7 @@ const PermissionPage: React.FC = () => {
         ]}
         data={filteredPermissions}
         emptyMessage={permissions.length === 0 ? '등록된 권한정보가 없습니다.' : '검색 결과가 없습니다.'}
+        onDelete={handleDelete}
         keyExtractor={(item) => item.id}
         fileName="권한정보"
       />

@@ -92,6 +92,20 @@ function DataTable<T extends { id?: string }>({
 
   const isAllSelected = paginatedData.length > 0 && paginatedData.every(item => selectedItems.has(keyExtractor(item)));
   const isIndeterminate = paginatedData.some(item => selectedItems.has(keyExtractor(item))) && !isAllSelected;
+  const hasSelectedItems = selectedItems.size > 0;
+
+  // 선택된 항목들 삭제
+  const handleDeleteSelected = () => {
+    if (!onDelete || selectedItems.size === 0) return;
+    
+    const confirmMessage = `선택된 ${selectedItems.size}개의 항목을 삭제하시겠습니까?`;
+    if (window.confirm(confirmMessage)) {
+      selectedItems.forEach((id) => {
+        onDelete(id);
+      });
+      setSelectedItems(new Set());
+    }
+  };
 
   // 엑셀 다운로드 함수
   const handleExportExcel = () => {
@@ -205,8 +219,30 @@ function DataTable<T extends { id?: string }>({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* 엑셀 다운로드 버튼 */}
-      <div className="flex justify-end">
+      {/* 엑셀 다운로드 버튼 및 삭제 버튼 */}
+      <div className="flex justify-end gap-3">
+        {hasSelectedItems && onDelete && (
+          <button
+            onClick={handleDeleteSelected}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            <span>선택 삭제 ({selectedItems.size})</span>
+          </button>
+        )}
         <button
           onClick={handleExportExcel}
           disabled={data.length === 0}

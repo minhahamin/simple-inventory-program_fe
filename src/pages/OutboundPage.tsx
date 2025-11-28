@@ -247,6 +247,7 @@ const OutboundPage: React.FC = () => {
         ]}
         data={filteredOutbounds}
         emptyMessage={outbounds.length === 0 ? '등록된 출고정보가 없습니다.' : '검색 결과가 없습니다.'}
+        onDelete={handleDelete}
         keyExtractor={(item) => item.id}
         fileName="출고정보"
       />
