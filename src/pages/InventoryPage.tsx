@@ -187,7 +187,7 @@ const InventoryPage: React.FC = () => {
             value={searchDate}
             onChange={setSearchDate}
             placeholder="등록일 검색"
-            className="w-48"
+            className="w-64"
           />
           <button
             onClick={handleOpenModal}
@@ -443,6 +443,7 @@ const InventoryPage: React.FC = () => {
                     value={formData.registeredDate}
                     onChange={(date) => setFormData((prev) => ({ ...prev, registeredDate: date }))}
                     required
+                    className="w-full"
                   />
                 </div>
               </div>

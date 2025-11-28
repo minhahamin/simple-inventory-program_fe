@@ -173,7 +173,7 @@ const InboundPage: React.FC = () => {
             value={searchDate}
             onChange={setSearchDate}
             placeholder="입고일 검색"
-            className="w-48"
+            className="w-64"
           />
           <button
             onClick={handleOpenModal}
