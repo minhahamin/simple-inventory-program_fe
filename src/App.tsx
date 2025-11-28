@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navigation from './components/Navigation';
+import Tabs from './components/Tabs';
 import ItemsPage from './pages/ItemsPage';
 import InboundPage from './pages/InboundPage';
 import OutboundPage from './pages/OutboundPage';
@@ -10,15 +11,62 @@ import PermissionPage from './pages/PermissionPage';
 
 type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'warehouse' | 'permission';
 
+interface Tab {
+  id: PageType;
+  label: string;
+}
+
+const pageLabels: Record<PageType, string> = {
+  items: '품목정보',
+  inbound: '입고정보',
+  outbound: '출고정보',
+  warehouse: '창고정보',
+  inventory: '재고정보',
+  status: '재고현황',
+  permission: '권한정보',
+};
+
 function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>('items');
+  const [tabs, setTabs] = useState<Tab[]>([{ id: 'items', label: '품목정보' }]);
+  const [activeTab, setActiveTab] = useState<PageType>('items');
 
   const handleNavigate = (page: PageType) => {
-    setCurrentPage(page);
+    // 이미 열려있는 탭인지 확인
+    const existingTab = tabs.find((tab) => tab.id === page);
+    
+    if (existingTab) {
+      // 이미 열려있으면 해당 탭으로 전환
+      setActiveTab(page);
+    } else {
+      // 새 탭 추가
+      const newTab: Tab = { id: page, label: pageLabels[page] };
+      setTabs([...tabs, newTab]);
+      setActiveTab(page);
+    }
+  };
+
+  const handleTabClick = (page: PageType) => {
+    setActiveTab(page);
+  };
+
+  const handleTabClose = (page: PageType) => {
+    if (tabs.length === 1) {
+      // 마지막 탭은 닫을 수 없음
+      return;
+    }
+
+    const newTabs = tabs.filter((tab) => tab.id !== page);
+    setTabs(newTabs);
+
+    // 닫은 탭이 활성 탭이었다면 다른 탭으로 전환
+    if (activeTab === page) {
+      const lastTab = newTabs[newTabs.length - 1];
+      setActiveTab(lastTab.id);
+    }
   };
 
   const renderPage = () => {
-    switch (currentPage) {
+    switch (activeTab) {
       case 'items':
         return <ItemsPage />;
       case 'inbound':
@@ -40,7 +88,15 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navigation currentPage={currentPage} onNavigate={handleNavigate} />
+      <Navigation currentPage={activeTab} onNavigate={handleNavigate} />
+      {tabs.length > 0 && (
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabClick={handleTabClick}
+          onTabClose={handleTabClose}
+        />
+      )}
       <main className="flex-1 bg-gray-100">
         {renderPage()}
       </main>
