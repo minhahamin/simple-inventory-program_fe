@@ -14,8 +14,60 @@ interface Inbound {
 }
 
 const InboundPage: React.FC = () => {
-  const [inbounds, setInbounds] = useState<Inbound[]>([]);
+  const [inbounds, setInbounds] = useState<Inbound[]>([
+    {
+      id: '1',
+      inboundDate: '2024-01-15',
+      itemCode: 'ITM-001',
+      itemName: '노트북',
+      quantity: 10,
+      unitPrice: 1200000,
+      supplier: '삼성전자',
+      memo: '신규 입고',
+    },
+    {
+      id: '2',
+      inboundDate: '2024-01-16',
+      itemCode: 'ITM-002',
+      itemName: '마우스',
+      quantity: 50,
+      unitPrice: 25000,
+      supplier: '로지텍',
+      memo: '재고 보충',
+    },
+    {
+      id: '3',
+      inboundDate: '2024-01-17',
+      itemCode: 'ITM-003',
+      itemName: '키보드',
+      quantity: 30,
+      unitPrice: 85000,
+      supplier: '코리아',
+      memo: '정기 입고',
+    },
+    {
+      id: '4',
+      inboundDate: '2024-01-18',
+      itemCode: 'ITM-004',
+      itemName: '모니터',
+      quantity: 20,
+      unitPrice: 350000,
+      supplier: 'LG전자',
+      memo: '신규 입고',
+    },
+    {
+      id: '5',
+      inboundDate: '2024-01-19',
+      itemCode: 'ITM-005',
+      itemName: '의자',
+      quantity: 15,
+      unitPrice: 250000,
+      supplier: '시디즈',
+      memo: '재고 보충',
+    },
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<Omit<Inbound, 'id'>>({
     inboundDate: '',
@@ -37,11 +89,30 @@ const InboundPage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditingId(null);
     setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    const inbound = inbounds.find((inbound) => inbound.id === id);
+    if (inbound) {
+      setEditingId(id);
+      setFormData({
+        inboundDate: inbound.inboundDate,
+        itemCode: inbound.itemCode,
+        itemName: inbound.itemName,
+        quantity: inbound.quantity,
+        unitPrice: inbound.unitPrice,
+        supplier: inbound.supplier,
+        memo: inbound.memo,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingId(null);
     setFormData({
       inboundDate: '',
       itemCode: '',
@@ -63,11 +134,17 @@ const InboundPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newInbound: Inbound = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-    setInbounds((prev) => [...prev, newInbound]);
+    if (editingId) {
+      setInbounds((prev) =>
+        prev.map((inbound) => (inbound.id === editingId ? { ...inbound, ...formData } : inbound))
+      );
+    } else {
+      const newInbound: Inbound = {
+        id: Date.now().toString(),
+        ...formData,
+      };
+      setInbounds((prev) => [...prev, newInbound]);
+    }
     handleCloseModal();
   };
 
@@ -168,12 +245,20 @@ const InboundPage: React.FC = () => {
             label: '작업',
             align: 'right',
             render: (item) => (
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
-              >
-                삭제
-              </button>
+              <div className="flex items-center gap-2 justify-end">
+                <button
+                  onClick={() => handleEdit(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-all duration-150"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
+                >
+                  삭제
+                </button>
+              </div>
             ),
           },
         ]}
@@ -186,7 +271,7 @@ const InboundPage: React.FC = () => {
       <DraggableModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="입고 등록"
+        title={editingId ? '입고 수정' : '입고 등록'}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -310,7 +395,7 @@ const InboundPage: React.FC = () => {
                   type="submit"
                   className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
-                  등록
+                  {editingId ? '수정' : '등록'}
                 </button>
               </div>
         </form>

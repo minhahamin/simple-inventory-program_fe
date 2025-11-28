@@ -7,23 +7,73 @@ interface Inventory {
   itemCode: string;
   itemName: string;
   currentStock: number;
-  minStock: number;
-  maxStock: number;
+  safeStock: number;
   unit: string;
   location: string;
   status: string;
 }
 
 const InventoryPage: React.FC = () => {
-  const [inventories, setInventories] = useState<Inventory[]>([]);
+  const [inventories, setInventories] = useState<Inventory[]>([
+    {
+      id: '1',
+      itemCode: 'ITM-001',
+      itemName: '노트북',
+      currentStock: 5,
+      safeStock: 10,
+      unit: '개',
+      location: 'A-1-1',
+      status: '정상',
+    },
+    {
+      id: '2',
+      itemCode: 'ITM-002',
+      itemName: '마우스',
+      currentStock: 30,
+      safeStock: 20,
+      unit: '개',
+      location: 'A-1-2',
+      status: '정상',
+    },
+    {
+      id: '3',
+      itemCode: 'ITM-003',
+      itemName: '키보드',
+      currentStock: 20,
+      safeStock: 15,
+      unit: '개',
+      location: 'A-1-3',
+      status: '정상',
+    },
+    {
+      id: '4',
+      itemCode: 'ITM-004',
+      itemName: '모니터',
+      currentStock: 12,
+      safeStock: 10,
+      unit: '개',
+      location: 'A-2-1',
+      status: '정상',
+    },
+    {
+      id: '5',
+      itemCode: 'ITM-005',
+      itemName: '의자',
+      currentStock: 10,
+      safeStock: 5,
+      unit: '개',
+      location: 'B-1-1',
+      status: '정상',
+    },
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<Omit<Inventory, 'id'>>({
     itemCode: '',
     itemName: '',
     currentStock: 0,
-    minStock: 0,
-    maxStock: 0,
+    safeStock: 0,
     unit: '',
     location: '',
     status: '정상',
@@ -38,17 +88,35 @@ const InventoryPage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditingId(null);
     setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    const inventory = inventories.find((inventory) => inventory.id === id);
+    if (inventory) {
+      setEditingId(id);
+      setFormData({
+        itemCode: inventory.itemCode,
+        itemName: inventory.itemName,
+        currentStock: inventory.currentStock,
+        safeStock: inventory.safeStock,
+        unit: inventory.unit,
+        location: inventory.location,
+        status: inventory.status,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingId(null);
     setFormData({
       itemCode: '',
       itemName: '',
       currentStock: 0,
-      minStock: 0,
-      maxStock: 0,
+      safeStock: 0,
       unit: '',
       location: '',
       status: '정상',
@@ -59,17 +127,23 @@ const InventoryPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'currentStock' || name === 'minStock' || name === 'maxStock' ? parseFloat(value) || 0 : value,
+      [name]: name === 'currentStock' || name === 'safeStock' ? parseFloat(value) || 0 : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newInventory: Inventory = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-    setInventories((prev) => [...prev, newInventory]);
+    if (editingId) {
+      setInventories((prev) =>
+        prev.map((inventory) => (inventory.id === editingId ? { ...inventory, ...formData } : inventory))
+      );
+    } else {
+      const newInventory: Inventory = {
+        id: Date.now().toString(),
+        ...formData,
+      };
+      setInventories((prev) => [...prev, newInventory]);
+    }
     handleCloseModal();
   };
 
@@ -80,10 +154,9 @@ const InventoryPage: React.FC = () => {
   };
 
 
-  const getStockStatus = (current: number, min: number) => {
-    if (current <= min) return '부족';
-    if (current <= min * 1.5) return '주의';
-    return '정상';
+  const getStockStatus = (current: number, safe: number) => {
+    if (current > safe) return '안전';
+    return '부족';
   };
 
   return (
@@ -142,17 +215,10 @@ const InventoryPage: React.FC = () => {
             ),
           },
           {
-            key: 'minStock',
-            label: '최소재고',
+            key: 'safeStock',
+            label: '안전재고',
             render: (item) => (
-              <span className="text-gray-700">{item.minStock.toLocaleString()}</span>
-            ),
-          },
-          {
-            key: 'maxStock',
-            label: '최대재고',
-            render: (item) => (
-              <span className="text-gray-700">{item.maxStock.toLocaleString()}</span>
+              <span className="text-gray-700">{item.safeStock.toLocaleString()}</span>
             ),
           },
           {
@@ -175,15 +241,13 @@ const InventoryPage: React.FC = () => {
             key: 'status',
             label: '상태',
             render: (item) => {
-              const stockStatus = getStockStatus(item.currentStock, item.minStock);
+              const stockStatus = getStockStatus(item.currentStock, item.safeStock);
               return (
                 <span
                   className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    stockStatus === '부족'
-                      ? 'bg-red-100 text-red-800'
-                      : stockStatus === '주의'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-green-100 text-green-800'
+                    stockStatus === '안전'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
                   }`}
                 >
                   {stockStatus}
@@ -196,12 +260,20 @@ const InventoryPage: React.FC = () => {
             label: '작업',
             align: 'right',
             render: (item) => (
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
-              >
-                삭제
-              </button>
+              <div className="flex items-center gap-2 justify-end">
+                <button
+                  onClick={() => handleEdit(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-all duration-150"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
+                >
+                  삭제
+                </button>
+              </div>
             ),
           },
         ]}
@@ -214,7 +286,7 @@ const InventoryPage: React.FC = () => {
       <DraggableModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="재고 등록"
+        title={editingId ? '재고 수정' : '재고 등록'}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,29 +339,12 @@ const InventoryPage: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    최소재고 <span className="text-red-500">*</span>
+                    안전재고 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    name="minStock"
-                    value={formData.minStock || ''}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    step="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    최대재고 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="maxStock"
-                    value={formData.maxStock || ''}
+                    name="safeStock"
+                    value={formData.safeStock || ''}
                     onChange={handleInputChange}
                     required
                     min="0"
@@ -368,7 +423,7 @@ const InventoryPage: React.FC = () => {
                   type="submit"
                   className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
-                  등록
+                  {editingId ? '수정' : '등록'}
                 </button>
               </div>
         </form>

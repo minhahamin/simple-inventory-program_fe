@@ -14,8 +14,60 @@ interface Permission {
 }
 
 const PermissionPage: React.FC = () => {
-  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([
+    {
+      id: '1',
+      userId: 'admin',
+      userName: '관리자',
+      role: '관리자',
+      department: 'IT팀',
+      email: 'admin@company.com',
+      status: '활성',
+      description: '시스템 관리자',
+    },
+    {
+      id: '2',
+      userId: 'user001',
+      userName: '김철수',
+      role: '일반사용자',
+      department: '영업팀',
+      email: 'kim@company.com',
+      status: '활성',
+      description: '영업 담당자',
+    },
+    {
+      id: '3',
+      userId: 'user002',
+      userName: '이영희',
+      role: '일반사용자',
+      department: '구매팀',
+      email: 'lee@company.com',
+      status: '활성',
+      description: '구매 담당자',
+    },
+    {
+      id: '4',
+      userId: 'user003',
+      userName: '박민수',
+      role: '운영자',
+      department: '물류팀',
+      email: 'park@company.com',
+      status: '활성',
+      description: '물류 운영자',
+    },
+    {
+      id: '5',
+      userId: 'user004',
+      userName: '최지영',
+      role: '일반사용자',
+      department: '회계팀',
+      email: 'choi@company.com',
+      status: '비활성',
+      description: '회계 담당자',
+    },
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<Omit<Permission, 'id'>>({
     userId: '',
@@ -38,11 +90,30 @@ const PermissionPage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditingId(null);
     setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    const permission = permissions.find((permission) => permission.id === id);
+    if (permission) {
+      setEditingId(id);
+      setFormData({
+        userId: permission.userId,
+        userName: permission.userName,
+        role: permission.role,
+        department: permission.department,
+        email: permission.email,
+        status: permission.status,
+        description: permission.description,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingId(null);
     setFormData({
       userId: '',
       userName: '',
@@ -64,11 +135,17 @@ const PermissionPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newPermission: Permission = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-    setPermissions((prev) => [...prev, newPermission]);
+    if (editingId) {
+      setPermissions((prev) =>
+        prev.map((permission) => (permission.id === editingId ? { ...permission, ...formData } : permission))
+      );
+    } else {
+      const newPermission: Permission = {
+        id: Date.now().toString(),
+        ...formData,
+      };
+      setPermissions((prev) => [...prev, newPermission]);
+    }
     handleCloseModal();
   };
 
@@ -177,12 +254,20 @@ const PermissionPage: React.FC = () => {
             label: '작업',
             align: 'right',
             render: (item) => (
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
-              >
-                삭제
-              </button>
+              <div className="flex items-center gap-2 justify-end">
+                <button
+                  onClick={() => handleEdit(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-all duration-150"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
+                >
+                  삭제
+                </button>
+              </div>
             ),
           },
         ]}
@@ -195,7 +280,7 @@ const PermissionPage: React.FC = () => {
       <DraggableModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="권한 등록"
+        title={editingId ? '권한 수정' : '권한 등록'}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -320,7 +405,7 @@ const PermissionPage: React.FC = () => {
                   type="submit"
                   className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
-                  등록
+                  {editingId ? '수정' : '등록'}
                 </button>
               </div>
         </form>

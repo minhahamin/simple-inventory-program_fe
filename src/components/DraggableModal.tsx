@@ -100,10 +100,14 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 p-4" onClick={onClose}>
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 p-4 flex items-center justify-center animate-fadeIn"
+      onClick={onClose}
+      style={{ animation: 'fadeIn 0.2s ease-out' }}
+    >
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-xl overflow-hidden relative"
+        className="bg-white rounded-2xl shadow-2xl overflow-hidden relative border border-gray-100 animate-slideUp"
         style={{
           position: 'absolute',
           left: `${modalPosition.x}px`,
@@ -111,20 +115,26 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
           width: `${modalSize.width}px`,
           height: `${modalSize.height}px`,
           cursor: isDragging ? 'move' : 'default',
+          animation: 'slideUp 0.3s ease-out',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 헤더 */}
         <div
-          className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center cursor-move select-none"
+          className="sticky top-0 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 px-6 py-5 flex justify-between items-center cursor-move select-none shadow-md z-10"
           onMouseDown={handleDragStart}
         >
-          <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 bg-white/30 rounded-full"></div>
+            <h2 className="text-2xl font-bold text-white drop-shadow-sm">{title}</h2>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-1.5 transition-all duration-200 cursor-pointer group"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -132,27 +142,57 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </button>
         </div>
 
-        <div className="overflow-y-auto" style={{ height: `${modalSize.height - 80}px` }}>
-          {children}
+        {/* 본문 */}
+        <div 
+          className="overflow-y-auto bg-gradient-to-b from-gray-50/50 to-white" 
+          style={{ height: `${modalSize.height - 80}px` }}
+        >
+          <div className="p-6">
+            {children}
+          </div>
         </div>
 
         {/* 리사이즈 핸들 */}
         <div
           ref={resizeHandleRef}
-          className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize bg-gray-200 hover:bg-blue-500 transition-colors"
+          className="absolute bottom-0 right-0 w-8 h-8 cursor-nwse-resize bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 transition-all duration-200 rounded-tl-lg shadow-lg group"
           style={{
             clipPath: 'polygon(100% 0, 0 100%, 100% 100%)',
           }}
           onMouseDown={handleResizeStart}
-        />
+        >
+          <div className="absolute bottom-1 right-1 w-2 h-2 bg-white/60 rounded-full group-hover:bg-white/80 transition-colors"></div>
+        </div>
       </div>
+      
+      {/* 애니메이션 스타일 */}
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 };

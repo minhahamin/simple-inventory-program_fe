@@ -31,17 +31,18 @@ function DataTable<T extends { id?: string }>({
     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gradient-to-r from-slate-50 to-gray-50">
+          <thead className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 shadow-md">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${
+                  className={`px-6 py-4 whitespace-nowrap text-left text-xs font-bold text-white uppercase tracking-wider border-r border-blue-400/30 last:border-r-0 ${
                     column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left'
                   } ${column.className || ''}`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">{column.label}</span>
+                    <div className="w-1 h-4 bg-white/30 rounded-full"></div>
+                    <span className="text-white drop-shadow-sm">{column.label}</span>
                   </div>
                 </th>
               ))}

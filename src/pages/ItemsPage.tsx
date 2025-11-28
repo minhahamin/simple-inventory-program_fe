@@ -13,8 +13,55 @@ interface Item {
 }
 
 const ItemsPage: React.FC = () => {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<Item[]>([
+    {
+      id: '1',
+      itemCode: 'ITM-001',
+      itemName: '노트북',
+      unitPrice: 1200000,
+      unit: '개',
+      category: '전자제품',
+      description: '고성능 노트북 컴퓨터',
+    },
+    {
+      id: '2',
+      itemCode: 'ITM-002',
+      itemName: '마우스',
+      unitPrice: 25000,
+      unit: '개',
+      category: '전자제품',
+      description: '무선 마우스',
+    },
+    {
+      id: '3',
+      itemCode: 'ITM-003',
+      itemName: '키보드',
+      unitPrice: 85000,
+      unit: '개',
+      category: '전자제품',
+      description: '기계식 키보드',
+    },
+    {
+      id: '4',
+      itemCode: 'ITM-004',
+      itemName: '모니터',
+      unitPrice: 350000,
+      unit: '개',
+      category: '전자제품',
+      description: '27인치 4K 모니터',
+    },
+    {
+      id: '5',
+      itemCode: 'ITM-005',
+      itemName: '의자',
+      unitPrice: 250000,
+      unit: '개',
+      category: '가구',
+      description: '사무용 의자',
+    },
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<Omit<Item, 'id'>>({
     itemCode: '',
@@ -34,11 +81,29 @@ const ItemsPage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditingId(null);
     setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    const item = items.find((item) => item.id === id);
+    if (item) {
+      setEditingId(id);
+      setFormData({
+        itemCode: item.itemCode,
+        itemName: item.itemName,
+        unitPrice: item.unitPrice,
+        unit: item.unit,
+        category: item.category,
+        description: item.description,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingId(null);
     setFormData({
       itemCode: '',
       itemName: '',
@@ -60,11 +125,17 @@ const ItemsPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newItem: Item = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-    setItems((prev) => [...prev, newItem]);
+    if (editingId) {
+      setItems((prev) =>
+        prev.map((item) => (item.id === editingId ? { ...item, ...formData } : item))
+      );
+    } else {
+      const newItem: Item = {
+        id: Date.now().toString(),
+        ...formData,
+      };
+      setItems((prev) => [...prev, newItem]);
+    }
     handleCloseModal();
   };
 
@@ -159,12 +230,20 @@ const ItemsPage: React.FC = () => {
             label: '작업',
             align: 'right',
             render: (item) => (
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
-              >
-                삭제
-              </button>
+              <div className="flex items-center gap-2 justify-end">
+                <button
+                  onClick={() => handleEdit(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-all duration-150"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
+                >
+                  삭제
+                </button>
+              </div>
             ),
           },
         ]}
@@ -177,7 +256,7 @@ const ItemsPage: React.FC = () => {
       <DraggableModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="품목 등록"
+        title={editingId ? '품목 수정' : '품목 등록'}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -294,7 +373,7 @@ const ItemsPage: React.FC = () => {
                   type="submit"
                   className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
-                  등록
+                  {editingId ? '수정' : '등록'}
                 </button>
               </div>
         </form>

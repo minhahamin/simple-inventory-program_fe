@@ -16,7 +16,73 @@ interface StockStatus {
 }
 
 const StatusPage: React.FC = () => {
-  const [stockStatuses, setStockStatuses] = useState<StockStatus[]>([]);
+  const [stockStatuses, setStockStatuses] = useState<StockStatus[]>([
+    {
+      id: '1',
+      itemCode: 'ITM-001',
+      itemName: '노트북',
+      currentStock: 5,
+      minStock: 10,
+      maxStock: 50,
+      unit: '개',
+      location: 'A-1-1',
+      stockStatus: '부족',
+      lastInboundDate: '2024-01-15',
+      lastOutboundDate: '2024-01-20',
+    },
+    {
+      id: '2',
+      itemCode: 'ITM-002',
+      itemName: '마우스',
+      currentStock: 30,
+      minStock: 20,
+      maxStock: 100,
+      unit: '개',
+      location: 'A-1-2',
+      stockStatus: '정상',
+      lastInboundDate: '2024-01-16',
+      lastOutboundDate: '2024-01-21',
+    },
+    {
+      id: '3',
+      itemCode: 'ITM-003',
+      itemName: '키보드',
+      currentStock: 20,
+      minStock: 15,
+      maxStock: 80,
+      unit: '개',
+      location: 'A-1-3',
+      stockStatus: '정상',
+      lastInboundDate: '2024-01-17',
+      lastOutboundDate: '2024-01-22',
+    },
+    {
+      id: '4',
+      itemCode: 'ITM-004',
+      itemName: '모니터',
+      currentStock: 12,
+      minStock: 10,
+      maxStock: 40,
+      unit: '개',
+      location: 'A-2-1',
+      stockStatus: '주의',
+      lastInboundDate: '2024-01-18',
+      lastOutboundDate: '2024-01-23',
+    },
+    {
+      id: '5',
+      itemCode: 'ITM-005',
+      itemName: '의자',
+      currentStock: 10,
+      minStock: 5,
+      maxStock: 30,
+      unit: '개',
+      location: 'B-1-1',
+      stockStatus: '정상',
+      lastInboundDate: '2024-01-19',
+      lastOutboundDate: '2024-01-24',
+    },
+  ]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('전체');
 

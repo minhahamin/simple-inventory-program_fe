@@ -15,8 +15,65 @@ interface Warehouse {
 }
 
 const WarehousePage: React.FC = () => {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([
+    {
+      id: '1',
+      warehouseCode: 'WH-001',
+      warehouseName: '본사 창고',
+      location: '서울시 강남구',
+      capacity: 10000,
+      currentStock: 7500,
+      manager: '김창고',
+      phone: '010-1234-5678',
+      description: '본사 메인 창고',
+    },
+    {
+      id: '2',
+      warehouseCode: 'WH-002',
+      warehouseName: '부산 지점 창고',
+      location: '부산시 해운대구',
+      capacity: 5000,
+      currentStock: 3200,
+      manager: '이창고',
+      phone: '010-2345-6789',
+      description: '부산 지점 창고',
+    },
+    {
+      id: '3',
+      warehouseCode: 'WH-003',
+      warehouseName: '대구 물류센터',
+      location: '대구시 수성구',
+      capacity: 8000,
+      currentStock: 5800,
+      manager: '박창고',
+      phone: '010-3456-7890',
+      description: '대구 지역 물류센터',
+    },
+    {
+      id: '4',
+      warehouseCode: 'WH-004',
+      warehouseName: '인천 창고',
+      location: '인천시 남동구',
+      capacity: 6000,
+      currentStock: 4200,
+      manager: '최창고',
+      phone: '010-4567-8901',
+      description: '인천 지역 창고',
+    },
+    {
+      id: '5',
+      warehouseCode: 'WH-005',
+      warehouseName: '광주 창고',
+      location: '광주시 광산구',
+      capacity: 4000,
+      currentStock: 2100,
+      manager: '정창고',
+      phone: '010-5678-9012',
+      description: '광주 지역 창고',
+    },
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<Omit<Warehouse, 'id'>>({
     warehouseCode: '',
@@ -39,11 +96,31 @@ const WarehousePage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditingId(null);
     setIsModalOpen(true);
+  };
+
+  const handleEdit = (id: string) => {
+    const warehouse = warehouses.find((warehouse) => warehouse.id === id);
+    if (warehouse) {
+      setEditingId(id);
+      setFormData({
+        warehouseCode: warehouse.warehouseCode,
+        warehouseName: warehouse.warehouseName,
+        location: warehouse.location,
+        capacity: warehouse.capacity,
+        currentStock: warehouse.currentStock,
+        manager: warehouse.manager,
+        phone: warehouse.phone,
+        description: warehouse.description,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingId(null);
     setFormData({
       warehouseCode: '',
       warehouseName: '',
@@ -66,11 +143,17 @@ const WarehousePage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newWarehouse: Warehouse = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-    setWarehouses((prev) => [...prev, newWarehouse]);
+    if (editingId) {
+      setWarehouses((prev) =>
+        prev.map((warehouse) => (warehouse.id === editingId ? { ...warehouse, ...formData } : warehouse))
+      );
+    } else {
+      const newWarehouse: Warehouse = {
+        id: Date.now().toString(),
+        ...formData,
+      };
+      setWarehouses((prev) => [...prev, newWarehouse]);
+    }
     handleCloseModal();
   };
 
@@ -201,12 +284,20 @@ const WarehousePage: React.FC = () => {
             label: '작업',
             align: 'right',
             render: (item) => (
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
-              >
-                삭제
-              </button>
+              <div className="flex items-center gap-2 justify-end">
+                <button
+                  onClick={() => handleEdit(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-all duration-150"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
+                >
+                  삭제
+                </button>
+              </div>
             ),
           },
         ]}
@@ -219,7 +310,7 @@ const WarehousePage: React.FC = () => {
       <DraggableModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="창고 등록"
+        title={editingId ? '창고 수정' : '창고 등록'}
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -359,7 +450,7 @@ const WarehousePage: React.FC = () => {
                   type="submit"
                   className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
-                  등록
+                  {editingId ? '수정' : '등록'}
                 </button>
               </div>
         </form>
