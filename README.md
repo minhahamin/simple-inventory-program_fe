@@ -1,70 +1,149 @@
-# Getting Started with Create React App
+# 자재관리 시스템 (Simple Inventory Program)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React와 TypeScript를 활용하여 개발한 자재관리 시스템입니다. 품목, 입고, 출고, 재고 등 다양한 정보를 효율적으로 관리할 수 있는 웹 애플리케이션입니다.
 
-## Available Scripts
+## 🚀 주요 기능
 
-In the project directory, you can run:
+### 1. 품목 관리
+- 품목 정보 등록, 수정, 삭제
+- 품목코드, 품목명, 단가, 단위, 카테고리 관리
+- 등록일 기준 검색 기능
 
-### `npm start`
+### 2. 입고/출고 관리
+- 입고 정보 등록 및 관리
+- 출고 정보 등록 및 관리
+- 입고일/출고일 기준 검색 기능
+- 공급처 및 고객 정보 관리
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 3. 재고 관리
+- 현재 재고 및 안전 재고 관리
+- 보관 위치 관리
+- 재고 상태 자동 판단 (안전/부족)
+- 등록일 기준 검색 기능
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 4. 재고 현황
+- 전체 재고 현황 조회
+- 재고 상태별 필터링 (안전/부족)
+- 실시간 재고 현황 모니터링
 
-### `npm test`
+### 5. 창고 정보 관리
+- 창고 정보 등록 및 관리
+- 창고별 재고 현황 조회
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 6. 권한 관리
+- 사용자 권한 정보 관리
+- 권한별 접근 제어
 
-### `npm run build`
+## 🛠️ 기술 스택
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Frontend Framework**: React 19.2.0
+- **Language**: TypeScript 5.9.3
+- **Styling**: Tailwind CSS 3.4.1
+- **Build Tool**: Create React App
+- **Package Manager**: npm
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📦 설치 및 실행
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 필수 요구사항
+- Node.js (v14 이상 권장)
+- npm 또는 yarn
 
-### `npm run eject`
+### 설치
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 개발 서버 실행
+```bash
+npm start
+```
+개발 서버가 실행되면 브라우저에서 [http://localhost:3000](http://localhost:3000)으로 접속할 수 있습니다.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 프로덕션 빌드
+```bash
+npm run build
+```
+빌드된 파일은 `build` 폴더에 생성됩니다.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🎨 주요 컴포넌트
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. Navigation
+- 상단 네비게이션 바
+- 그라데이션 배경 및 아이콘
+- 현재 페이지 하이라이트
 
-## Learn More
+### 2. Tabs
+- 다이나믹 탭 기능
+- 여러 페이지를 동시에 열어두고 전환 가능
+- 탭 닫기 기능
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 3. DataTable
+- 재사용 가능한 테이블 컴포넌트
+- 컬럼 리사이징 기능
+- 작업 컬럼 고정 (sticky)
+- 행 호버 효과
+- 검색 및 필터링 지원
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 4. DraggableModal
+- 드래그 가능한 모달
+- 리사이징 기능
+- 커스텀 스타일링
+- 애니메이션 효과
 
-### Code Splitting
+### 5. DatePicker
+- 커스텀 달력 컴포넌트
+- 년도/월 선택 기능
+- 날짜 범위 선택 기능
+- 일요일/토요일 색상 구분
+- 오늘 날짜 강조
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 📁 프로젝트 구조
 
-### Analyzing the Bundle Size
+```
+src/
+├── components/          # 재사용 가능한 컴포넌트
+│   ├── Navigation.tsx   # 네비게이션 바
+│   ├── Tabs.tsx        # 탭 컴포넌트
+│   ├── DataTable.tsx   # 테이블 컴포넌트
+│   ├── DraggableModal.tsx  # 모달 컴포넌트
+│   └── DatePicker.tsx  # 날짜 선택 컴포넌트
+├── pages/              # 페이지 컴포넌트
+│   ├── ItemsPage.tsx   # 품목정보 페이지
+│   ├── InboundPage.tsx # 입고정보 페이지
+│   ├── OutboundPage.tsx # 출고정보 페이지
+│   ├── InventoryPage.tsx # 재고정보 페이지
+│   ├── StatusPage.tsx  # 재고현황 페이지
+│   ├── WarehousePage.tsx # 창고정보 페이지
+│   └── PermissionPage.tsx # 권한정보 페이지
+├── App.tsx            # 메인 앱 컴포넌트
+└── index.css          # 글로벌 스타일
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## ✨ 주요 특징
 
-### Making a Progressive Web App
+- **반응형 디자인**: 다양한 화면 크기에 대응
+- **사용자 친화적 UI**: 직관적인 인터페이스와 부드러운 애니메이션
+- **타입 안정성**: TypeScript로 타입 안정성 보장
+- **컴포넌트 재사용성**: 재사용 가능한 컴포넌트 구조
+- **실시간 검색**: 텍스트 및 날짜 기반 실시간 검색 기능
+- **다이나믹 탭**: 여러 페이지를 동시에 관리할 수 있는 탭 기능
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🔍 검색 기능
 
-### Advanced Configuration
+모든 페이지에서 다음 검색 기능을 지원합니다:
+- 텍스트 검색: 품목코드, 품목명, 기타 관련 필드
+- 날짜 검색: 등록일, 입고일, 출고일 기준 검색
+- 날짜 범위 검색: 시작일과 종료일을 지정하여 범위 검색
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 📝 개발 노트
 
-### Deployment
+이 프로젝트는 Create React App으로 시작되었으며, 점진적으로 기능을 추가하고 개선해왔습니다. 주요 개선 사항:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- 컴포넌트 재사용성을 높이기 위한 리팩토링
+- 사용자 경험 개선을 위한 UI/UX 개선
+- 성능 최적화 및 코드 품질 향상
+- 접근성 및 반응형 디자인 개선
 
-### `npm run build` fails to minify
+## 📄 라이선스
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+이 프로젝트는 개인 포트폴리오용으로 개발되었습니다.
