@@ -8,8 +8,9 @@ import InventoryPage from './pages/InventoryPage';
 import StatusPage from './pages/StatusPage';
 import WarehousePage from './pages/WarehousePage';
 import PermissionPage from './pages/PermissionPage';
+import InOutStatusPage from './pages/InOutStatusPage';
 
-type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'warehouse' | 'permission';
+type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'warehouse' | 'permission' | 'inoutStatus';
 
 interface Tab {
   id: PageType;
@@ -24,6 +25,7 @@ const pageLabels: Record<PageType, string> = {
   inventory: '재고정보',
   status: '재고현황',
   permission: '권한정보',
+  inoutStatus: '입출고현황',
 };
 
 function App() {
@@ -81,6 +83,8 @@ function App() {
         return <WarehousePage />;
       case 'permission':
         return <PermissionPage />;
+      case 'inoutStatus':
+        return <InOutStatusPage />;
       default:
         return <ItemsPage />;
     }

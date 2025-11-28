@@ -1,6 +1,6 @@
 import React from 'react';
 
-type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'permission' | 'warehouse';
+type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'permission' | 'warehouse' | 'inoutStatus';
 
 interface Tab {
   id: PageType;
