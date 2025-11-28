@@ -1,13 +1,332 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DraggableModal from '../components/DraggableModal';
+import DataTable from '../components/DataTable';
+
+interface Permission {
+  id: string;
+  userId: string;
+  userName: string;
+  role: string;
+  department: string;
+  email: string;
+  status: string;
+  description: string;
+}
 
 const PermissionPage: React.FC = () => {
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [formData, setFormData] = useState<Omit<Permission, 'id'>>({
+    userId: '',
+    userName: '',
+    role: '',
+    department: '',
+    email: '',
+    status: '활성',
+    description: '',
+  });
+
+  const filteredPermissions = permissions.filter((permission) => {
+    const matchesSearch =
+      permission.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      permission.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      permission.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      permission.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      permission.role.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  });
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      userId: '',
+      userName: '',
+      role: '',
+      department: '',
+      email: '',
+      status: '활성',
+      description: '',
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newPermission: Permission = {
+      id: Date.now().toString(),
+      ...formData,
+    };
+    setPermissions((prev) => [...prev, newPermission]);
+    handleCloseModal();
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      setPermissions((prev) => prev.filter((permission) => permission.id !== id));
+    }
+  };
+
+
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
-      <h1 className="text-slate-700 mb-5 text-3xl">권한정보</h1>
-      <p className="text-gray-600 text-lg leading-relaxed">권한 정보를 관리하는 페이지입니다.</p>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-slate-700 text-3xl font-bold">권한정보</h1>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="사용자ID, 사용자명, 이메일, 부서, 권한등급 검색..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            onClick={handleOpenModal}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-200 flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            등록
+          </button>
+        </div>
+      </div>
+
+      {/* 권한 리스트 테이블 */}
+      <DataTable
+        columns={[
+          {
+            key: 'userId',
+            label: '사용자ID',
+            render: (item) => (
+              <span className="font-semibold text-gray-900">{item.userId}</span>
+            ),
+          },
+          {
+            key: 'userName',
+            label: '사용자명',
+            render: (item) => <span className="text-gray-700 font-medium">{item.userName}</span>,
+          },
+          {
+            key: 'role',
+            label: '권한등급',
+            render: (item) => (
+              <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-md text-xs font-medium">
+                {item.role}
+              </span>
+            ),
+          },
+          {
+            key: 'department',
+            label: '부서',
+            render: (item) => (
+              <span className="text-gray-700">{item.department}</span>
+            ),
+          },
+          {
+            key: 'email',
+            label: '이메일',
+            render: (item) => (
+              <span className="text-gray-700">{item.email}</span>
+            ),
+          },
+          {
+            key: 'status',
+            label: '상태',
+            render: (item) => (
+              <span
+                className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                  item.status === '활성'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {item.status}
+              </span>
+            ),
+          },
+          {
+            key: 'description',
+            label: '설명',
+            render: (item) => (
+              <span className="text-gray-600 max-w-xs truncate block">{item.description || '-'}</span>
+            ),
+          },
+          {
+            key: 'actions',
+            label: '작업',
+            align: 'right',
+            render: (item) => (
+              <button
+                onClick={() => handleDelete(item.id)}
+                className="px-4 py-1.5 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-all duration-150"
+              >
+                삭제
+              </button>
+            ),
+          },
+        ]}
+        data={filteredPermissions}
+        emptyMessage={permissions.length === 0 ? '등록된 권한정보가 없습니다.' : '검색 결과가 없습니다.'}
+        keyExtractor={(item) => item.id}
+      />
+
+      {/* 등록 모달 */}
+      <DraggableModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title="권한 등록"
+      >
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    사용자ID <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="userId"
+                    value={formData.userId}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="예: USER-001"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    사용자명 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="userName"
+                    value={formData.userName}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="사용자명을 입력하세요"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    권한등급 <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">선택하세요</option>
+                    <option value="관리자">관리자</option>
+                    <option value="일반사용자">일반사용자</option>
+                    <option value="조회전용">조회전용</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    부서 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="부서를 입력하세요"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    이메일 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="example@email.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    상태 <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="활성">활성</option>
+                    <option value="비활성">비활성</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  설명
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="권한에 대한 설명을 입력하세요"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  등록
+                </button>
+              </div>
+        </form>
+      </DraggableModal>
     </div>
   );
 };
 
 export default PermissionPage;
-

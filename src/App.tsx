@@ -5,9 +5,10 @@ import InboundPage from './pages/InboundPage';
 import OutboundPage from './pages/OutboundPage';
 import InventoryPage from './pages/InventoryPage';
 import StatusPage from './pages/StatusPage';
+import WarehousePage from './pages/WarehousePage';
 import PermissionPage from './pages/PermissionPage';
 
-type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'permission';
+type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'warehouse' | 'permission';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('items');
@@ -28,6 +29,8 @@ function App() {
         return <InventoryPage />;
       case 'status':
         return <StatusPage />;
+      case 'warehouse':
+        return <WarehousePage />;
       case 'permission':
         return <PermissionPage />;
       default:

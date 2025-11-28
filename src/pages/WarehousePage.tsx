@@ -2,38 +2,39 @@ import React, { useState } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
 
-interface Inventory {
+interface Warehouse {
   id: string;
-  itemCode: string;
-  itemName: string;
-  currentStock: number;
-  minStock: number;
-  maxStock: number;
-  unit: string;
+  warehouseCode: string;
+  warehouseName: string;
   location: string;
-  status: string;
+  capacity: number;
+  currentStock: number;
+  manager: string;
+  phone: string;
+  description: string;
 }
 
-const InventoryPage: React.FC = () => {
-  const [inventories, setInventories] = useState<Inventory[]>([]);
+const WarehousePage: React.FC = () => {
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState<Omit<Inventory, 'id'>>({
-    itemCode: '',
-    itemName: '',
-    currentStock: 0,
-    minStock: 0,
-    maxStock: 0,
-    unit: '',
+  const [formData, setFormData] = useState<Omit<Warehouse, 'id'>>({
+    warehouseCode: '',
+    warehouseName: '',
     location: '',
-    status: '정상',
+    capacity: 0,
+    currentStock: 0,
+    manager: '',
+    phone: '',
+    description: '',
   });
 
-  const filteredInventories = inventories.filter((inventory) => {
+  const filteredWarehouses = warehouses.filter((warehouse) => {
     const matchesSearch =
-      inventory.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inventory.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inventory.location.toLowerCase().includes(searchTerm.toLowerCase());
+      warehouse.warehouseCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.warehouseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.manager.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -44,14 +45,14 @@ const InventoryPage: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setFormData({
-      itemCode: '',
-      itemName: '',
-      currentStock: 0,
-      minStock: 0,
-      maxStock: 0,
-      unit: '',
+      warehouseCode: '',
+      warehouseName: '',
       location: '',
-      status: '정상',
+      capacity: 0,
+      currentStock: 0,
+      manager: '',
+      phone: '',
+      description: '',
     });
   };
 
@@ -59,41 +60,40 @@ const InventoryPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'currentStock' || name === 'minStock' || name === 'maxStock' ? parseFloat(value) || 0 : value,
+      [name]: name === 'capacity' || name === 'currentStock' ? parseFloat(value) || 0 : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newInventory: Inventory = {
+    const newWarehouse: Warehouse = {
       id: Date.now().toString(),
       ...formData,
     };
-    setInventories((prev) => [...prev, newInventory]);
+    setWarehouses((prev) => [...prev, newWarehouse]);
     handleCloseModal();
   };
 
   const handleDelete = (id: string) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      setInventories((prev) => prev.filter((inventory) => inventory.id !== id));
+      setWarehouses((prev) => prev.filter((warehouse) => warehouse.id !== id));
     }
   };
 
 
-  const getStockStatus = (current: number, min: number) => {
-    if (current <= min) return '부족';
-    if (current <= min * 1.5) return '주의';
-    return '정상';
+  const getUsageRate = (current: number, capacity: number) => {
+    if (capacity === 0) return 0;
+    return Math.round((current / capacity) * 100);
   };
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-slate-700 text-3xl font-bold">재고정보</h1>
+        <h1 className="text-slate-700 text-3xl font-bold">창고정보</h1>
         <div className="flex gap-3">
           <input
             type="text"
-            placeholder="품목코드, 품목명, 보관위치 검색..."
+            placeholder="창고코드, 창고명, 위치, 담당자 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -119,20 +119,34 @@ const InventoryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 재고 리스트 테이블 */}
+      {/* 창고 리스트 테이블 */}
       <DataTable
         columns={[
           {
-            key: 'itemCode',
-            label: '품목코드',
+            key: 'warehouseCode',
+            label: '창고코드',
             render: (item) => (
-              <span className="font-semibold text-blue-600">{item.itemCode}</span>
+              <span className="font-semibold text-blue-600">{item.warehouseCode}</span>
             ),
           },
           {
-            key: 'itemName',
-            label: '품목명',
-            render: (item) => <span className="text-gray-700">{item.itemName}</span>,
+            key: 'warehouseName',
+            label: '창고명',
+            render: (item) => <span className="text-gray-700 font-medium">{item.warehouseName}</span>,
+          },
+          {
+            key: 'location',
+            label: '위치',
+            render: (item) => (
+              <span className="text-gray-700">{item.location}</span>
+            ),
+          },
+          {
+            key: 'capacity',
+            label: '용량',
+            render: (item) => (
+              <span className="text-gray-700">{item.capacity.toLocaleString()}</span>
+            ),
           },
           {
             key: 'currentStock',
@@ -142,54 +156,45 @@ const InventoryPage: React.FC = () => {
             ),
           },
           {
-            key: 'minStock',
-            label: '최소재고',
-            render: (item) => (
-              <span className="text-gray-700">{item.minStock.toLocaleString()}</span>
-            ),
-          },
-          {
-            key: 'maxStock',
-            label: '최대재고',
-            render: (item) => (
-              <span className="text-gray-700">{item.maxStock.toLocaleString()}</span>
-            ),
-          },
-          {
-            key: 'unit',
-            label: '단위',
-            render: (item) => (
-              <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">
-                {item.unit}
-              </span>
-            ),
-          },
-          {
-            key: 'location',
-            label: '보관위치',
-            render: (item) => (
-              <span className="text-gray-700">{item.location}</span>
-            ),
-          },
-          {
-            key: 'status',
-            label: '상태',
+            key: 'usageRate',
+            label: '사용률',
             render: (item) => {
-              const stockStatus = getStockStatus(item.currentStock, item.minStock);
+              const usageRate = getUsageRate(item.currentStock, item.capacity);
               return (
                 <span
                   className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    stockStatus === '부족'
+                    usageRate >= 90
                       ? 'bg-red-100 text-red-800'
-                      : stockStatus === '주의'
+                      : usageRate >= 70
                       ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-green-100 text-green-800'
                   }`}
                 >
-                  {stockStatus}
+                  {usageRate}%
                 </span>
               );
             },
+          },
+          {
+            key: 'manager',
+            label: '담당자',
+            render: (item) => (
+              <span className="text-gray-700">{item.manager}</span>
+            ),
+          },
+          {
+            key: 'phone',
+            label: '연락처',
+            render: (item) => (
+              <span className="text-gray-700">{item.phone}</span>
+            ),
+          },
+          {
+            key: 'description',
+            label: '설명',
+            render: (item) => (
+              <span className="text-gray-600 max-w-xs truncate block">{item.description || '-'}</span>
+            ),
           },
           {
             key: 'actions',
@@ -205,8 +210,8 @@ const InventoryPage: React.FC = () => {
             ),
           },
         ]}
-        data={filteredInventories}
-        emptyMessage={inventories.length === 0 ? '등록된 재고정보가 없습니다.' : '검색 결과가 없습니다.'}
+        data={filteredWarehouses}
+        emptyMessage={warehouses.length === 0 ? '등록된 창고정보가 없습니다.' : '검색 결과가 없습니다.'}
         keyExtractor={(item) => item.id}
       />
 
@@ -214,37 +219,69 @@ const InventoryPage: React.FC = () => {
       <DraggableModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="재고 등록"
+        title="창고 등록"
       >
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    품목코드 <span className="text-red-500">*</span>
+                    창고코드 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="itemCode"
-                    value={formData.itemCode}
+                    name="warehouseCode"
+                    value={formData.warehouseCode}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="예: ITM-001"
+                    placeholder="예: WH-001"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    품목명 <span className="text-red-500">*</span>
+                    창고명 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="itemName"
-                    value={formData.itemName}
+                    name="warehouseName"
+                    value={formData.warehouseName}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="품목명을 입력하세요"
+                    placeholder="창고명을 입력하세요"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    위치 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="예: 서울시 강남구"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    용량 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="capacity"
+                    value={formData.capacity || ''}
+                    onChange={handleInputChange}
+                    required
+                    min="0"
+                    step="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0"
                   />
                 </div>
 
@@ -267,93 +304,47 @@ const InventoryPage: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    최소재고 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="minStock"
-                    value={formData.minStock || ''}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    step="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    최대재고 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="maxStock"
-                    value={formData.maxStock || ''}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    step="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    단위 <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="unit"
-                    value={formData.unit}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">선택하세요</option>
-                    <option value="개">개</option>
-                    <option value="박스">박스</option>
-                    <option value="팩">팩</option>
-                    <option value="kg">kg</option>
-                    <option value="g">g</option>
-                    <option value="L">L</option>
-                    <option value="mL">mL</option>
-                    <option value="m">m</option>
-                    <option value="cm">cm</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    보관위치 <span className="text-red-500">*</span>
+                    담당자 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="location"
-                    value={formData.location}
+                    name="manager"
+                    value={formData.manager}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="예: A-1-01"
+                    placeholder="담당자명을 입력하세요"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    상태 <span className="text-red-500">*</span>
+                    연락처 <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    name="status"
-                    value={formData.status}
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="정상">정상</option>
-                    <option value="보관중">보관중</option>
-                    <option value="폐기">폐기</option>
-                  </select>
+                    placeholder="010-1234-5678"
+                  />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  설명
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="창고에 대한 설명을 입력하세요"
+                />
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
@@ -377,4 +368,5 @@ const InventoryPage: React.FC = () => {
   );
 };
 
-export default InventoryPage;
+export default WarehousePage;
+

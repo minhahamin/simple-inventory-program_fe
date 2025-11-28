@@ -1,6 +1,6 @@
 import React from 'react';
 
-type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'permission';
+type PageType = 'items' | 'inbound' | 'outbound' | 'inventory' | 'status' | 'permission' | 'warehouse';
 
 interface NavigationProps {
   currentPage: PageType;
@@ -12,8 +12,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
     { id: 'items', label: '품목정보' },
     { id: 'inbound', label: '입고정보' },
     { id: 'outbound', label: '출고정보' },
+    { id: 'warehouse', label: '창고정보' },
     { id: 'inventory', label: '재고정보' },
     { id: 'status', label: '재고현황' },
+
     { id: 'permission', label: '권한정보' },
   ];
 
