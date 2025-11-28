@@ -96,22 +96,9 @@ const InOutStatusPage: React.FC = () => {
     { id: '25', outboundDate: '2024-02-14', itemCode: 'ITM-025', itemName: '충전기', quantity: 18, unitPrice: 45000, customer: 'RST회사', memo: '주문 출고' },
   ];
 
-  // KPI 계산
-  const kpiData = useMemo(() => {
-    const totalInboundAmount = inbounds.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    const totalOutboundAmount = outbounds.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    const netProfit = totalOutboundAmount - totalInboundAmount;
-    const inboundCount = inbounds.length;
-    const outboundCount = outbounds.length;
-
-    return {
-      totalInboundAmount,
-      totalOutboundAmount,
-      netProfit,
-      inboundCount,
-      outboundCount,
-    };
-  }, []);
+  // 입출고 건수 데이터
+  const inboundCount = inbounds.length;
+  const outboundCount = outbounds.length;
 
   // 월별 데이터 집계
   const monthlyData = useMemo(() => {
@@ -168,102 +155,20 @@ const InOutStatusPage: React.FC = () => {
 
   // 입출고 건수 데이터
   const countData = [
-    { name: '입고', value: kpiData.inboundCount, color: '#3b82f6' },
-    { name: '출고', value: kpiData.outboundCount, color: '#ef4444' },
+    { name: '입고', value: inboundCount, color: '#3b82f6' },
+    { name: '출고', value: outboundCount, color: '#ef4444' },
   ];
 
   const COLORS = ['#3b82f6', '#ef4444'];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* 헤더 */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">입출고현황</h1>
-          <p className="text-gray-600">입고 및 출고 데이터를 한눈에 확인하세요</p>
-        </div>
+    <div className="max-w-7xl mx-auto py-10 px-5">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-slate-700 text-3xl font-bold">입출고현황</h1>
+      </div>
 
-        {/* KPI 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">총 입고 금액</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {kpiData.totalInboundAmount.toLocaleString()}원
-                </p>
-              </div>
-              <div className="bg-blue-100 rounded-full p-3">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">총 출고 금액</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {kpiData.totalOutboundAmount.toLocaleString()}원
-                </p>
-              </div>
-              <div className="bg-red-100 rounded-full p-3">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">순이익</p>
-                <p className={`text-2xl font-bold ${kpiData.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {kpiData.netProfit.toLocaleString()}원
-                </p>
-              </div>
-              <div className="bg-green-100 rounded-full p-3">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">입고 건수</p>
-                <p className="text-2xl font-bold text-gray-900">{kpiData.inboundCount}건</p>
-              </div>
-              <div className="bg-purple-100 rounded-full p-3">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">출고 건수</p>
-                <p className="text-2xl font-bold text-gray-900">{kpiData.outboundCount}건</p>
-              </div>
-              <div className="bg-orange-100 rounded-full p-3">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 차트 영역 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      {/* 차트 영역 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* 월별 입출고 추이 */}
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">월별 입출고 추이</h2>
@@ -290,7 +195,7 @@ const InOutStatusPage: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
@@ -305,21 +210,20 @@ const InOutStatusPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 품목별 입출고 현황 */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">품목별 입출고 현황 (상위 10개)</h2>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={itemData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" label={{ value: '금액 (백만원)', position: 'insideBottom' }} />
-              <YAxis dataKey="품목" type="category" width={100} />
-              <Tooltip formatter={(value: number) => `${value}백만원`} />
-              <Legend />
-              <Bar dataKey="입고" fill="#3b82f6" />
-              <Bar dataKey="출고" fill="#ef4444" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      {/* 품목별 입출고 현황 */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">품목별 입출고 현황 (상위 10개)</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={itemData} layout="vertical">
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" label={{ value: '금액 (백만원)', position: 'insideBottom' }} />
+            <YAxis dataKey="품목" type="category" width={100} />
+            <Tooltip formatter={(value: number) => `${value}백만원`} />
+            <Legend />
+            <Bar dataKey="입고" fill="#3b82f6" />
+            <Bar dataKey="출고" fill="#ef4444" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
