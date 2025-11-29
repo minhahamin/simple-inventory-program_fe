@@ -1,53 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
 import ConfirmModal from '../components/ConfirmModal';
-
-interface Permission {
-  id: string;
-  userId: string;
-  userName: string;
-  role: string;
-  department: string;
-  email: string;
-  status: string;
-  description: string;
-}
+import { usersApi, User, CreateUserDto, UpdateUserDto } from '../api/usersApi';
 
 const PermissionPage: React.FC = () => {
-  const [permissions, setPermissions] = useState<Permission[]>([
-    { id: '1', userId: 'admin', userName: '관리자', role: '관리자', department: 'IT팀', email: 'admin@company.com', status: '활성', description: '시스템 관리자' },
-    { id: '2', userId: 'user001', userName: '김철수', role: '일반사용자', department: '영업팀', email: 'kim@company.com', status: '활성', description: '영업 담당자' },
-    { id: '3', userId: 'user002', userName: '이영희', role: '일반사용자', department: '구매팀', email: 'lee@company.com', status: '활성', description: '구매 담당자' },
-    { id: '4', userId: 'user003', userName: '박민수', role: '운영자', department: '물류팀', email: 'park@company.com', status: '활성', description: '물류 운영자' },
-    { id: '5', userId: 'user004', userName: '최지영', role: '일반사용자', department: '회계팀', email: 'choi@company.com', status: '비활성', description: '회계 담당자' },
-    { id: '6', userId: 'user005', userName: '정수진', role: '일반사용자', department: '마케팅팀', email: 'jung@company.com', status: '활성', description: '마케팅 담당자' },
-    { id: '7', userId: 'user006', userName: '강호영', role: '운영자', department: '물류팀', email: 'kang@company.com', status: '활성', description: '물류 운영자' },
-    { id: '8', userId: 'user007', userName: '윤서연', role: '일반사용자', department: '인사팀', email: 'yoon@company.com', status: '활성', description: '인사 담당자' },
-    { id: '9', userId: 'user008', userName: '장민호', role: '일반사용자', department: '영업팀', email: 'jang@company.com', status: '활성', description: '영업 담당자' },
-    { id: '10', userId: 'user009', userName: '임지훈', role: '일반사용자', department: '구매팀', email: 'lim@company.com', status: '활성', description: '구매 담당자' },
-    { id: '11', userId: 'user010', userName: '한소영', role: '운영자', department: '물류팀', email: 'han@company.com', status: '활성', description: '물류 운영자' },
-    { id: '12', userId: 'user011', userName: '오준혁', role: '일반사용자', department: '회계팀', email: 'oh@company.com', status: '활성', description: '회계 담당자' },
-    { id: '13', userId: 'user012', userName: '서미래', role: '일반사용자', department: '마케팅팀', email: 'seo@company.com', status: '활성', description: '마케팅 담당자' },
-    { id: '14', userId: 'user013', userName: '신동욱', role: '일반사용자', department: 'IT팀', email: 'shin@company.com', status: '활성', description: 'IT 담당자' },
-    { id: '15', userId: 'user014', userName: '유하늘', role: '일반사용자', department: '영업팀', email: 'yu@company.com', status: '비활성', description: '영업 담당자' },
-    { id: '16', userId: 'user015', userName: '조성민', role: '운영자', department: '물류팀', email: 'cho@company.com', status: '활성', description: '물류 운영자' },
-    { id: '17', userId: 'user016', userName: '허지은', role: '일반사용자', department: '구매팀', email: 'heo@company.com', status: '활성', description: '구매 담당자' },
-    { id: '18', userId: 'user017', userName: '남도현', role: '일반사용자', department: '회계팀', email: 'nam@company.com', status: '활성', description: '회계 담당자' },
-    { id: '19', userId: 'user018', userName: '문수빈', role: '일반사용자', department: '마케팅팀', email: 'moon@company.com', status: '활성', description: '마케팅 담당자' },
-    { id: '20', userId: 'user019', userName: '양태영', role: '일반사용자', department: '인사팀', email: 'yang@company.com', status: '활성', description: '인사 담당자' },
-    { id: '21', userId: 'user020', userName: '배현우', role: '운영자', department: '물류팀', email: 'bae@company.com', status: '활성', description: '물류 운영자' },
-    { id: '22', userId: 'user021', userName: '백지혜', role: '일반사용자', department: '영업팀', email: 'baek@company.com', status: '활성', description: '영업 담당자' },
-    { id: '23', userId: 'user022', userName: '송민재', role: '일반사용자', department: '구매팀', email: 'song@company.com', status: '활성', description: '구매 담당자' },
-    { id: '24', userId: 'user023', userName: '권혜진', role: '일반사용자', department: 'IT팀', email: 'kwon@company.com', status: '활성', description: 'IT 담당자' },
-    { id: '25', userId: 'user024', userName: '황준호', role: '일반사용자', department: '회계팀', email: 'hwang@company.com', status: '비활성', description: '회계 담당자' },
-  ]);
+  const [permissions, setPermissions] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Omit<Permission, 'id'>>({
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Omit<User, 'id'>>({
     userId: '',
     userName: '',
     role: '',
@@ -56,6 +22,24 @@ const PermissionPage: React.FC = () => {
     status: '활성',
     description: '',
   });
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await usersApi.findAll();
+      setPermissions(data);
+    } catch (err) {
+      setError('권한정보를 불러오는데 실패했습니다.');
+      console.error('Failed to fetch users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredPermissions = permissions.filter((permission) => {
     const matchesSearch =
@@ -111,20 +95,48 @@ const PermissionPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      setPermissions((prev) =>
-        prev.map((permission) => (permission.id === editingId ? { ...permission, ...formData } : permission))
-      );
-    } else {
-      const newPermission: Permission = {
-        id: Date.now().toString(),
-        ...formData,
-      };
-      setPermissions((prev) => [...prev, newPermission]);
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (editingId) {
+        // 수정
+        const updateDto: UpdateUserDto = {
+          userId: formData.userId,
+          userName: formData.userName,
+          role: formData.role,
+          department: formData.department,
+          email: formData.email,
+          status: formData.status,
+          description: formData.description,
+        };
+        const updatedUser = await usersApi.update(editingId, updateDto);
+        setPermissions((prev) =>
+          prev.map((permission) => (permission.id === editingId ? updatedUser : permission))
+        );
+      } else {
+        // 등록
+        const createDto: CreateUserDto = {
+          userId: formData.userId,
+          userName: formData.userName,
+          role: formData.role,
+          department: formData.department,
+          email: formData.email,
+          status: formData.status,
+          description: formData.description,
+        };
+        const newUser = await usersApi.create(createDto);
+        setPermissions((prev) => [...prev, newUser]);
+      }
+      handleCloseModal();
+    } catch (err) {
+      setError(editingId ? '수정에 실패했습니다.' : '등록에 실패했습니다.');
+      console.error('Failed to save user:', err);
+    } finally {
+      setLoading(false);
     }
-    handleCloseModal();
   };
 
   const handleDelete = (id: string) => {
@@ -132,17 +144,41 @@ const PermissionPage: React.FC = () => {
     setShowDeleteConfirm(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (deleteTargetId) {
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) {
+      setShowDeleteConfirm(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      await usersApi.remove(deleteTargetId);
       setPermissions((prev) => prev.filter((permission) => permission.id !== deleteTargetId));
       setDeleteTargetId(null);
+      setShowDeleteConfirm(false);
+    } catch (err) {
+      setError('삭제에 실패했습니다.');
+      console.error('Failed to delete user:', err);
+      setShowDeleteConfirm(false);
+    } finally {
+      setLoading(false);
     }
-    setShowDeleteConfirm(false);
   };
 
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+          처리 중...
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-slate-700 text-3xl font-bold">권한정보</h1>
         <div className="flex gap-3">
