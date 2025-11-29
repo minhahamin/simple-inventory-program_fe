@@ -1,54 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
 import DatePicker from '../components/DatePicker';
 import ConfirmModal from '../components/ConfirmModal';
-
-interface Outbound {
-  id: string;
-  outboundDate: string;
-  itemCode: string;
-  itemName: string;
-  quantity: number;
-  unitPrice: number;
-  customer: string;
-  memo: string;
-}
+import { outboundApi, Outbound, CreateOutboundDto, UpdateOutboundDto } from '../api/outboundApi';
 
 const OutboundPage: React.FC = () => {
-  const [outbounds, setOutbounds] = useState<Outbound[]>([
-    { id: '1', outboundDate: '2024-01-20', itemCode: 'ITM-001', itemName: '노트북', quantity: 5, unitPrice: 1200000, customer: 'ABC회사', memo: '주문 출고' },
-    { id: '2', outboundDate: '2024-01-21', itemCode: 'ITM-002', itemName: '마우스', quantity: 20, unitPrice: 25000, customer: 'XYZ회사', memo: '정기 출고' },
-    { id: '3', outboundDate: '2024-01-22', itemCode: 'ITM-003', itemName: '키보드', quantity: 10, unitPrice: 85000, customer: 'DEF회사', memo: '주문 출고' },
-    { id: '4', outboundDate: '2024-01-23', itemCode: 'ITM-004', itemName: '모니터', quantity: 8, unitPrice: 350000, customer: 'GHI회사', memo: '정기 출고' },
-    { id: '5', outboundDate: '2024-01-24', itemCode: 'ITM-005', itemName: '의자', quantity: 5, unitPrice: 250000, customer: 'JKL회사', memo: '주문 출고' },
-    { id: '6', outboundDate: '2024-01-25', itemCode: 'ITM-006', itemName: '책상', quantity: 3, unitPrice: 180000, customer: 'MNO회사', memo: '정기 출고' },
-    { id: '7', outboundDate: '2024-01-26', itemCode: 'ITM-007', itemName: '스피커', quantity: 8, unitPrice: 150000, customer: 'PQR회사', memo: '주문 출고' },
-    { id: '8', outboundDate: '2024-01-27', itemCode: 'ITM-008', itemName: '헤드셋', quantity: 12, unitPrice: 120000, customer: 'STU회사', memo: '정기 출고' },
-    { id: '9', outboundDate: '2024-01-28', itemCode: 'ITM-009', itemName: '웹캠', quantity: 6, unitPrice: 80000, customer: 'VWX회사', memo: '주문 출고' },
-    { id: '10', outboundDate: '2024-01-29', itemCode: 'ITM-010', itemName: '마이크', quantity: 4, unitPrice: 95000, customer: 'YZA회사', memo: '정기 출고' },
-    { id: '11', outboundDate: '2024-01-30', itemCode: 'ITM-011', itemName: '램프', quantity: 15, unitPrice: 45000, customer: 'BCD회사', memo: '주문 출고' },
-    { id: '12', outboundDate: '2024-02-01', itemCode: 'ITM-012', itemName: '파일함', quantity: 20, unitPrice: 35000, customer: 'EFG회사', memo: '정기 출고' },
-    { id: '13', outboundDate: '2024-02-02', itemCode: 'ITM-013', itemName: '프린터', quantity: 2, unitPrice: 450000, customer: 'HIJ회사', memo: '주문 출고' },
-    { id: '14', outboundDate: '2024-02-03', itemCode: 'ITM-014', itemName: '복사기', quantity: 1, unitPrice: 1200000, customer: 'KLM회사', memo: '정기 출고' },
-    { id: '15', outboundDate: '2024-02-04', itemCode: 'ITM-015', itemName: '스캐너', quantity: 3, unitPrice: 280000, customer: 'NOP회사', memo: '주문 출고' },
-    { id: '16', outboundDate: '2024-02-05', itemCode: 'ITM-016', itemName: '서버', quantity: 1, unitPrice: 3500000, customer: 'QRS회사', memo: '정기 출고' },
-    { id: '17', outboundDate: '2024-02-06', itemCode: 'ITM-017', itemName: '라우터', quantity: 5, unitPrice: 180000, customer: 'TUV회사', memo: '주문 출고' },
-    { id: '18', outboundDate: '2024-02-07', itemCode: 'ITM-018', itemName: '스위치', quantity: 4, unitPrice: 250000, customer: 'WXY회사', memo: '정기 출고' },
-    { id: '19', outboundDate: '2024-02-08', itemCode: 'ITM-019', itemName: '백업장치', quantity: 2, unitPrice: 550000, customer: 'ZAB회사', memo: '주문 출고' },
-    { id: '20', outboundDate: '2024-02-09', itemCode: 'ITM-020', itemName: 'USB 메모리', quantity: 30, unitPrice: 25000, customer: 'CDE회사', memo: '정기 출고' },
-    { id: '21', outboundDate: '2024-02-10', itemCode: 'ITM-021', itemName: '마우스패드', quantity: 25, unitPrice: 15000, customer: 'FGH회사', memo: '주문 출고' },
-    { id: '22', outboundDate: '2024-02-11', itemCode: 'ITM-022', itemName: '모니터암', quantity: 6, unitPrice: 120000, customer: 'IJK회사', memo: '정기 출고' },
-    { id: '23', outboundDate: '2024-02-12', itemCode: 'ITM-023', itemName: '케이블', quantity: 40, unitPrice: 15000, customer: 'LMN회사', memo: '주문 출고' },
-    { id: '24', outboundDate: '2024-02-13', itemCode: 'ITM-024', itemName: '어댑터', quantity: 12, unitPrice: 35000, customer: 'OPQ회사', memo: '정기 출고' },
-    { id: '25', outboundDate: '2024-02-14', itemCode: 'ITM-025', itemName: '충전기', quantity: 18, unitPrice: 45000, customer: 'RST회사', memo: '주문 출고' },
-  ]);
+  const [outbounds, setOutbounds] = useState<Outbound[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchDate, setSearchDate] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<Outbound, 'id'>>({
     outboundDate: '',
     itemCode: '',
@@ -58,6 +24,24 @@ const OutboundPage: React.FC = () => {
     customer: '',
     memo: '',
   });
+
+  useEffect(() => {
+    fetchOutbounds();
+  }, []);
+
+  const fetchOutbounds = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await outboundApi.findAll();
+      setOutbounds(data);
+    } catch (err) {
+      setError('출고정보를 불러오는데 실패했습니다.');
+      console.error('Failed to fetch outbounds:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredOutbounds = outbounds.filter((outbound) => {
     const matchesSearch =
@@ -112,20 +96,47 @@ const OutboundPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      setOutbounds((prev) =>
-        prev.map((outbound) => (outbound.id === editingId ? { ...outbound, ...formData } : outbound))
-      );
-    } else {
-      const newOutbound: Outbound = {
-        id: Date.now().toString(),
-        ...formData,
-      };
-      setOutbounds((prev) => [...prev, newOutbound]);
+    try {
+      setLoading(true);
+      setError(null);
+      if (editingId) {
+        // 수정
+        const updateDto: UpdateOutboundDto = {
+          outboundDate: formData.outboundDate,
+          itemCode: formData.itemCode,
+          itemName: formData.itemName,
+          quantity: formData.quantity,
+          unitPrice: formData.unitPrice,
+          customer: formData.customer,
+          memo: formData.memo,
+        };
+        const updatedOutbound = await outboundApi.update(editingId, updateDto);
+        setOutbounds((prev) =>
+          prev.map((outbound) => (outbound.id === editingId ? updatedOutbound : outbound))
+        );
+      } else {
+        // 등록
+        const createDto: CreateOutboundDto = {
+          outboundDate: formData.outboundDate,
+          itemCode: formData.itemCode,
+          itemName: formData.itemName,
+          quantity: formData.quantity,
+          unitPrice: formData.unitPrice,
+          customer: formData.customer,
+          memo: formData.memo,
+        };
+        const newOutbound = await outboundApi.create(createDto);
+        setOutbounds((prev) => [...prev, newOutbound]);
+      }
+      handleCloseModal();
+    } catch (err) {
+      setError(editingId ? '수정에 실패했습니다.' : '등록에 실패했습니다.');
+      console.error('Failed to save outbound:', err);
+    } finally {
+      setLoading(false);
     }
-    handleCloseModal();
   };
 
   const handleDelete = (id: string) => {
@@ -133,10 +144,20 @@ const OutboundPage: React.FC = () => {
     setShowDeleteConfirm(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteTargetId) {
-      setOutbounds((prev) => prev.filter((outbound) => outbound.id !== deleteTargetId));
-      setDeleteTargetId(null);
+      try {
+        setLoading(true);
+        setError(null);
+        await outboundApi.remove(deleteTargetId);
+        setOutbounds((prev) => prev.filter((outbound) => outbound.id !== deleteTargetId));
+        setDeleteTargetId(null);
+      } catch (err) {
+        setError('삭제에 실패했습니다.');
+        console.error('Failed to delete outbound:', err);
+      } finally {
+        setLoading(false);
+      }
     }
     setShowDeleteConfirm(false);
   };
@@ -144,6 +165,16 @@ const OutboundPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-md">
+          처리 중...
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-slate-700 text-3xl font-bold">출고정보</h1>
         <div className="flex gap-3">

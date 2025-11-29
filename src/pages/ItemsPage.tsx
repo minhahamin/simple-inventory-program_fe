@@ -1,54 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
-import DatePicker from '../components/DatePicker';
 import ConfirmModal from '../components/ConfirmModal';
-
-interface Item {
-  id: string;
-  itemCode: string;
-  itemName: string;
-  unitPrice: number;
-  unit: string;
-  category: string;
-  description: string;
-  registeredDate: string;
-}
+import { itemsApi, Item, CreateItemDto, UpdateItemDto } from '../api/itemsApi';
 
 const ItemsPage: React.FC = () => {
-  const [items, setItems] = useState<Item[]>([
-    { id: '1', itemCode: 'ITM-001', itemName: '노트북', unitPrice: 1200000, unit: '개', category: '전자제품', description: '고성능 노트북 컴퓨터', registeredDate: '2024-01-10' },
-    { id: '2', itemCode: 'ITM-002', itemName: '마우스', unitPrice: 25000, unit: '개', category: '전자제품', description: '무선 마우스', registeredDate: '2024-01-11' },
-    { id: '3', itemCode: 'ITM-003', itemName: '키보드', unitPrice: 85000, unit: '개', category: '전자제품', description: '기계식 키보드', registeredDate: '2024-01-12' },
-    { id: '4', itemCode: 'ITM-004', itemName: '모니터', unitPrice: 350000, unit: '개', category: '전자제품', description: '27인치 4K 모니터', registeredDate: '2024-01-13' },
-    { id: '5', itemCode: 'ITM-005', itemName: '의자', unitPrice: 250000, unit: '개', category: '가구', description: '사무용 의자', registeredDate: '2024-01-14' },
-    { id: '6', itemCode: 'ITM-006', itemName: '책상', unitPrice: 180000, unit: '개', category: '가구', description: '사무용 책상', registeredDate: '2024-01-15' },
-    { id: '7', itemCode: 'ITM-007', itemName: '스피커', unitPrice: 150000, unit: '개', category: '전자제품', description: '블루투스 스피커', registeredDate: '2024-01-16' },
-    { id: '8', itemCode: 'ITM-008', itemName: '헤드셋', unitPrice: 120000, unit: '개', category: '전자제품', description: '무선 헤드셋', registeredDate: '2024-01-17' },
-    { id: '9', itemCode: 'ITM-009', itemName: '웹캠', unitPrice: 80000, unit: '개', category: '전자제품', description: 'HD 웹캠', registeredDate: '2024-01-18' },
-    { id: '10', itemCode: 'ITM-010', itemName: '마이크', unitPrice: 95000, unit: '개', category: '전자제품', description: 'USB 마이크', registeredDate: '2024-01-19' },
-    { id: '11', itemCode: 'ITM-011', itemName: '램프', unitPrice: 45000, unit: '개', category: '가구', description: 'LED 데스크 램프', registeredDate: '2024-01-20' },
-    { id: '12', itemCode: 'ITM-012', itemName: '파일함', unitPrice: 35000, unit: '개', category: '사무용품', description: '서류 보관함', registeredDate: '2024-01-21' },
-    { id: '13', itemCode: 'ITM-013', itemName: '프린터', unitPrice: 450000, unit: '개', category: '전자제품', description: '레이저 프린터', registeredDate: '2024-01-22' },
-    { id: '14', itemCode: 'ITM-014', itemName: '복사기', unitPrice: 1200000, unit: '개', category: '전자제품', description: '다기능 복사기', registeredDate: '2024-01-23' },
-    { id: '15', itemCode: 'ITM-015', itemName: '스캐너', unitPrice: 280000, unit: '개', category: '전자제품', description: '문서 스캐너', registeredDate: '2024-01-24' },
-    { id: '16', itemCode: 'ITM-016', itemName: '서버', unitPrice: 3500000, unit: '개', category: '전자제품', description: '서버 컴퓨터', registeredDate: '2024-01-25' },
-    { id: '17', itemCode: 'ITM-017', itemName: '라우터', unitPrice: 180000, unit: '개', category: '전자제품', description: '무선 라우터', registeredDate: '2024-01-26' },
-    { id: '18', itemCode: 'ITM-018', itemName: '스위치', unitPrice: 250000, unit: '개', category: '전자제품', description: '네트워크 스위치', registeredDate: '2024-01-27' },
-    { id: '19', itemCode: 'ITM-019', itemName: '백업장치', unitPrice: 550000, unit: '개', category: '전자제품', description: '외장 하드디스크', registeredDate: '2024-01-28' },
-    { id: '20', itemCode: 'ITM-020', itemName: 'USB 메모리', unitPrice: 25000, unit: '개', category: '전자제품', description: '64GB USB', registeredDate: '2024-01-29' },
-    { id: '21', itemCode: 'ITM-021', itemName: '마우스패드', unitPrice: 15000, unit: '개', category: '사무용품', description: '게이밍 마우스패드', registeredDate: '2024-01-30' },
-    { id: '22', itemCode: 'ITM-022', itemName: '모니터암', unitPrice: 120000, unit: '개', category: '가구', description: '듀얼 모니터암', registeredDate: '2024-02-01' },
-    { id: '23', itemCode: 'ITM-023', itemName: '케이블', unitPrice: 15000, unit: '개', category: '전자제품', description: 'HDMI 케이블', registeredDate: '2024-02-02' },
-    { id: '24', itemCode: 'ITM-024', itemName: '어댑터', unitPrice: 35000, unit: '개', category: '전자제품', description: 'USB-C 어댑터', registeredDate: '2024-02-03' },
-    { id: '25', itemCode: 'ITM-025', itemName: '충전기', unitPrice: 45000, unit: '개', category: '전자제품', description: '고속 충전기', registeredDate: '2024-02-04' },
-  ]);
+  const [items, setItems] = useState<Item[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchDate, setSearchDate] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<Item, 'id'>>({
     itemCode: '',
     itemName: '',
@@ -56,16 +20,33 @@ const ItemsPage: React.FC = () => {
     unit: '',
     category: '',
     description: '',
-    registeredDate: '',
   });
+
+  // 데이터 로드
+  useEffect(() => {
+    loadItems();
+  }, []);
+
+  const loadItems = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await itemsApi.findAll();
+      setItems(data);
+    } catch (err) {
+      setError('데이터를 불러오는데 실패했습니다.');
+      console.error('Failed to load items:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDate = !searchDate || item.registeredDate === searchDate;
-    return matchesSearch && matchesDate;
+    return matchesSearch;
   });
 
   const handleOpenModal = () => {
@@ -84,7 +65,6 @@ const ItemsPage: React.FC = () => {
         unit: item.unit,
         category: item.category,
         description: item.description,
-        registeredDate: item.registeredDate,
       });
       setIsModalOpen(true);
     }
@@ -93,15 +73,14 @@ const ItemsPage: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setFormData({
-      itemCode: '',
-      itemName: '',
-      unitPrice: 0,
-      unit: '',
-      category: '',
-      description: '',
-      registeredDate: '',
-    });
+      setFormData({
+        itemCode: '',
+        itemName: '',
+        unitPrice: 0,
+        unit: '',
+        category: '',
+        description: '',
+      });
   };
 
 
@@ -113,20 +92,46 @@ const ItemsPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      setItems((prev) =>
-        prev.map((item) => (item.id === editingId ? { ...item, ...formData } : item))
-      );
-    } else {
-      const newItem: Item = {
-        id: Date.now().toString(),
-        ...formData,
-      };
-      setItems((prev) => [...prev, newItem]);
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (editingId) {
+        // 수정
+        const updateDto: UpdateItemDto = {
+          itemCode: formData.itemCode,
+          itemName: formData.itemName,
+          unitPrice: formData.unitPrice,
+          unit: formData.unit,
+          category: formData.category,
+          description: formData.description,
+        };
+        const updatedItem = await itemsApi.update(editingId, updateDto);
+        setItems((prev) =>
+          prev.map((item) => (item.id === editingId ? updatedItem : item))
+        );
+      } else {
+        // 등록
+        const createDto: CreateItemDto = {
+          itemCode: formData.itemCode,
+          itemName: formData.itemName,
+          unitPrice: formData.unitPrice,
+          unit: formData.unit,
+          category: formData.category,
+          description: formData.description,
+        };
+        const newItem = await itemsApi.create(createDto);
+        setItems((prev) => [...prev, newItem]);
+      }
+      handleCloseModal();
+    } catch (err) {
+      setError(editingId ? '수정에 실패했습니다.' : '등록에 실패했습니다.');
+      console.error('Failed to save item:', err);
+    } finally {
+      setLoading(false);
     }
-    handleCloseModal();
   };
 
   const handleDelete = (id: string) => {
@@ -134,16 +139,40 @@ const ItemsPage: React.FC = () => {
     setShowDeleteConfirm(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (deleteTargetId) {
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) {
+      setShowDeleteConfirm(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      await itemsApi.remove(deleteTargetId);
       setItems((prev) => prev.filter((item) => item.id !== deleteTargetId));
       setDeleteTargetId(null);
+      setShowDeleteConfirm(false);
+    } catch (err) {
+      setError('삭제에 실패했습니다.');
+      console.error('Failed to delete item:', err);
+      setShowDeleteConfirm(false);
+    } finally {
+      setLoading(false);
     }
-    setShowDeleteConfirm(false);
   };
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+          처리 중...
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-slate-700 text-3xl font-bold">품목정보</h1>
         <div className="flex gap-3">
@@ -153,12 +182,6 @@ const ItemsPage: React.FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <DatePicker
-            value={searchDate}
-            onChange={setSearchDate}
-            placeholder="등록일 검색"
-            className="w-64"
           />
           <button
             onClick={handleOpenModal}
@@ -229,13 +252,6 @@ const ItemsPage: React.FC = () => {
             ),
           },
           {
-            key: 'registeredDate',
-            label: '등록일',
-            render: (item) => (
-              <span className="text-gray-700">{item.registeredDate}</span>
-            ),
-          },
-          {
             key: 'actions',
             label: '작업',
             align: 'right',
@@ -274,14 +290,13 @@ const ItemsPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    품목코드 <span className="text-red-500">*</span>
+                    품목코드
                   </label>
                   <input
                     type="text"
                     name="itemCode"
                     value={formData.itemCode}
                     onChange={handleInputChange}
-                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="예: ITM-001"
                   />
@@ -370,17 +385,6 @@ const ItemsPage: React.FC = () => {
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="품목에 대한 설명을 입력하세요"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    등록일 <span className="text-red-500">*</span>
-                  </label>
-                  <DatePicker
-                    value={formData.registeredDate}
-                    onChange={(date) => setFormData((prev) => ({ ...prev, registeredDate: date }))}
-                    required
                   />
                 </div>
 

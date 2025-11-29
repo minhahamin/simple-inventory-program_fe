@@ -1,53 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DraggableModal from '../components/DraggableModal';
 import DataTable from '../components/DataTable';
 import ConfirmModal from '../components/ConfirmModal';
-
-interface Warehouse {
-  id: string;
-  warehouseCode: string;
-  warehouseName: string;
-  location: string;
-  capacity: number;
-  currentStock: number;
-  manager: string;
-  phone: string;
-  description: string;
-}
+import { warehouseApi, Warehouse, CreateWarehouseDto, UpdateWarehouseDto } from '../api/warehouseApi';
 
 const WarehousePage: React.FC = () => {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([
-    { id: '1', warehouseCode: 'WH-001', warehouseName: '본사 창고', location: '서울시 강남구', capacity: 10000, currentStock: 7500, manager: '김창고', phone: '010-1234-5678', description: '본사 메인 창고' },
-    { id: '2', warehouseCode: 'WH-002', warehouseName: '부산 지점 창고', location: '부산시 해운대구', capacity: 5000, currentStock: 3200, manager: '이창고', phone: '010-2345-6789', description: '부산 지점 창고' },
-    { id: '3', warehouseCode: 'WH-003', warehouseName: '대구 물류센터', location: '대구시 수성구', capacity: 8000, currentStock: 5800, manager: '박창고', phone: '010-3456-7890', description: '대구 지역 물류센터' },
-    { id: '4', warehouseCode: 'WH-004', warehouseName: '인천 창고', location: '인천시 남동구', capacity: 6000, currentStock: 4200, manager: '최창고', phone: '010-4567-8901', description: '인천 지역 창고' },
-    { id: '5', warehouseCode: 'WH-005', warehouseName: '광주 창고', location: '광주시 광산구', capacity: 4000, currentStock: 2100, manager: '정창고', phone: '010-5678-9012', description: '광주 지역 창고' },
-    { id: '6', warehouseCode: 'WH-006', warehouseName: '대전 창고', location: '대전시 유성구', capacity: 4500, currentStock: 2800, manager: '강창고', phone: '010-6789-0123', description: '대전 지역 창고' },
-    { id: '7', warehouseCode: 'WH-007', warehouseName: '울산 창고', location: '울산시 남구', capacity: 3500, currentStock: 1900, manager: '윤창고', phone: '010-7890-1234', description: '울산 지역 창고' },
-    { id: '8', warehouseCode: 'WH-008', warehouseName: '수원 창고', location: '수원시 영통구', capacity: 5500, currentStock: 3800, manager: '장창고', phone: '010-8901-2345', description: '수원 지역 창고' },
-    { id: '9', warehouseCode: 'WH-009', warehouseName: '성남 창고', location: '성남시 분당구', capacity: 4800, currentStock: 3100, manager: '임창고', phone: '010-9012-3456', description: '성남 지역 창고' },
-    { id: '10', warehouseCode: 'WH-010', warehouseName: '고양 창고', location: '고양시 일산동구', capacity: 5200, currentStock: 3600, manager: '한창고', phone: '010-0123-4567', description: '고양 지역 창고' },
-    { id: '11', warehouseCode: 'WH-011', warehouseName: '용인 창고', location: '용인시 기흥구', capacity: 4200, currentStock: 2700, manager: '오창고', phone: '010-1234-5679', description: '용인 지역 창고' },
-    { id: '12', warehouseCode: 'WH-012', warehouseName: '평택 창고', location: '평택시 서정동', capacity: 3800, currentStock: 2400, manager: '서창고', phone: '010-2345-6780', description: '평택 지역 창고' },
-    { id: '13', warehouseCode: 'WH-013', warehouseName: '천안 창고', location: '천안시 동남구', capacity: 4000, currentStock: 2600, manager: '신창고', phone: '010-3456-7891', description: '천안 지역 창고' },
-    { id: '14', warehouseCode: 'WH-014', warehouseName: '전주 창고', location: '전주시 덕진구', capacity: 3600, currentStock: 2200, manager: '유창고', phone: '010-4567-8902', description: '전주 지역 창고' },
-    { id: '15', warehouseCode: 'WH-015', warehouseName: '청주 창고', location: '청주시 상당구', capacity: 3900, currentStock: 2500, manager: '조창고', phone: '010-5678-9013', description: '청주 지역 창고' },
-    { id: '16', warehouseCode: 'WH-016', warehouseName: '제주 창고', location: '제주시 연동', capacity: 3000, currentStock: 1800, manager: '허창고', phone: '010-6789-0124', description: '제주 지역 창고' },
-    { id: '17', warehouseCode: 'WH-017', warehouseName: '포항 창고', location: '포항시 남구', capacity: 3200, currentStock: 2000, manager: '남창고', phone: '010-7890-1235', description: '포항 지역 창고' },
-    { id: '18', warehouseCode: 'WH-018', warehouseName: '창원 창고', location: '창원시 의창구', capacity: 4100, currentStock: 2700, manager: '문창고', phone: '010-8901-2346', description: '창원 지역 창고' },
-    { id: '19', warehouseCode: 'WH-019', warehouseName: '구미 창고', location: '구미시 선산읍', capacity: 3700, currentStock: 2300, manager: '양창고', phone: '010-9012-3457', description: '구미 지역 창고' },
-    { id: '20', warehouseCode: 'WH-020', warehouseName: '안산 창고', location: '안산시 단원구', capacity: 4400, currentStock: 2900, manager: '배창고', phone: '010-0123-4568', description: '안산 지역 창고' },
-    { id: '21', warehouseCode: 'WH-021', warehouseName: '안양 창고', location: '안양시 만안구', capacity: 4000, currentStock: 2600, manager: '백창고', phone: '010-1234-5680', description: '안양 지역 창고' },
-    { id: '22', warehouseCode: 'WH-022', warehouseName: '의정부 창고', location: '의정부시 호원동', capacity: 3500, currentStock: 2200, manager: '송창고', phone: '010-2345-6791', description: '의정부 지역 창고' },
-    { id: '23', warehouseCode: 'WH-023', warehouseName: '파주 창고', location: '파주시 문산읍', capacity: 4600, currentStock: 3000, manager: '권창고', phone: '010-3456-7902', description: '파주 지역 창고' },
-    { id: '24', warehouseCode: 'WH-024', warehouseName: '이천 창고', location: '이천시 장호원읍', capacity: 3300, currentStock: 2100, manager: '황창고', phone: '010-4567-8013', description: '이천 지역 창고' },
-    { id: '25', warehouseCode: 'WH-025', warehouseName: '춘천 창고', location: '춘천시 신북읍', capacity: 3100, currentStock: 1900, manager: '강창고', phone: '010-5678-9024', description: '춘천 지역 창고' },
-  ]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Omit<Warehouse, 'id'>>({
     warehouseCode: '',
     warehouseName: '',
@@ -58,6 +23,24 @@ const WarehousePage: React.FC = () => {
     phone: '',
     description: '',
   });
+
+  useEffect(() => {
+    fetchWarehouses();
+  }, []);
+
+  const fetchWarehouses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await warehouseApi.findAll();
+      setWarehouses(data);
+    } catch (err) {
+      setError('창고정보를 불러오는데 실패했습니다.');
+      console.error('Failed to fetch warehouses:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredWarehouses = warehouses.filter((warehouse) => {
     const matchesSearch =
@@ -114,20 +97,49 @@ const WarehousePage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      setWarehouses((prev) =>
-        prev.map((warehouse) => (warehouse.id === editingId ? { ...warehouse, ...formData } : warehouse))
-      );
-    } else {
-      const newWarehouse: Warehouse = {
-        id: Date.now().toString(),
-        ...formData,
-      };
-      setWarehouses((prev) => [...prev, newWarehouse]);
+    try {
+      setLoading(true);
+      setError(null);
+      if (editingId) {
+        // 수정
+        const updateDto: UpdateWarehouseDto = {
+          warehouseCode: formData.warehouseCode,
+          warehouseName: formData.warehouseName,
+          location: formData.location,
+          capacity: formData.capacity,
+          currentStock: formData.currentStock,
+          manager: formData.manager,
+          phone: formData.phone,
+          description: formData.description,
+        };
+        const updatedWarehouse = await warehouseApi.update(editingId, updateDto);
+        setWarehouses((prev) =>
+          prev.map((warehouse) => (warehouse.id === editingId ? updatedWarehouse : warehouse))
+        );
+      } else {
+        // 등록
+        const createDto: CreateWarehouseDto = {
+          warehouseCode: formData.warehouseCode,
+          warehouseName: formData.warehouseName,
+          location: formData.location,
+          capacity: formData.capacity,
+          currentStock: formData.currentStock,
+          manager: formData.manager,
+          phone: formData.phone,
+          description: formData.description,
+        };
+        const newWarehouse = await warehouseApi.create(createDto);
+        setWarehouses((prev) => [...prev, newWarehouse]);
+      }
+      handleCloseModal();
+    } catch (err) {
+      setError(editingId ? '수정에 실패했습니다.' : '등록에 실패했습니다.');
+      console.error('Failed to save warehouse:', err);
+    } finally {
+      setLoading(false);
     }
-    handleCloseModal();
   };
 
   const handleDelete = (id: string) => {
@@ -135,10 +147,20 @@ const WarehousePage: React.FC = () => {
     setShowDeleteConfirm(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteTargetId) {
-      setWarehouses((prev) => prev.filter((warehouse) => warehouse.id !== deleteTargetId));
-      setDeleteTargetId(null);
+      try {
+        setLoading(true);
+        setError(null);
+        await warehouseApi.remove(deleteTargetId);
+        setWarehouses((prev) => prev.filter((warehouse) => warehouse.id !== deleteTargetId));
+        setDeleteTargetId(null);
+      } catch (err) {
+        setError('삭제에 실패했습니다.');
+        console.error('Failed to delete warehouse:', err);
+      } finally {
+        setLoading(false);
+      }
     }
     setShowDeleteConfirm(false);
   };
@@ -151,6 +173,16 @@ const WarehousePage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-md">
+          처리 중...
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-slate-700 text-3xl font-bold">창고정보</h1>
         <div className="flex gap-3">

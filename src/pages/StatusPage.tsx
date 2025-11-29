@@ -1,90 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
-
-interface StockStatus {
-  id: string;
-  itemCode: string;
-  itemName: string;
-  currentStock: number;
-  safeStock: number;
-  unit: string;
-  location: string;
-  stockStatus: string;
-  lastInboundDate: string;
-  lastOutboundDate: string;
-}
+import { inventoryApi, Inventory } from '../api/inventoryApi';
 
 const StatusPage: React.FC = () => {
-  const [stockStatuses, setStockStatuses] = useState<StockStatus[]>([
-    {
-      id: '1',
-      itemCode: 'ITM-001',
-      itemName: '노트북',
-      currentStock: 5,
-      safeStock: 10,
-      unit: '개',
-      location: 'A-1-1',
-      stockStatus: '부족',
-      lastInboundDate: '2024-01-15',
-      lastOutboundDate: '2024-01-20',
-    },
-    {
-      id: '2',
-      itemCode: 'ITM-002',
-      itemName: '마우스',
-      currentStock: 30,
-      safeStock: 20,
-      unit: '개',
-      location: 'A-1-2',
-      stockStatus: '안전',
-      lastInboundDate: '2024-01-16',
-      lastOutboundDate: '2024-01-21',
-    },
-    {
-      id: '3',
-      itemCode: 'ITM-003',
-      itemName: '키보드',
-      currentStock: 20,
-      safeStock: 15,
-      unit: '개',
-      location: 'A-1-3',
-      stockStatus: '안전',
-      lastInboundDate: '2024-01-17',
-      lastOutboundDate: '2024-01-22',
-    },
-    {
-      id: '4',
-      itemCode: 'ITM-004',
-      itemName: '모니터',
-      currentStock: 12,
-      safeStock: 10,
-      unit: '개',
-      location: 'A-2-1',
-      stockStatus: '안전',
-      lastInboundDate: '2024-01-18',
-      lastOutboundDate: '2024-01-23',
-    },
-    {
-      id: '5',
-      itemCode: 'ITM-005',
-      itemName: '의자',
-      currentStock: 10,
-      safeStock: 5,
-      unit: '개',
-      location: 'B-1-1',
-      stockStatus: '안전',
-      lastInboundDate: '2024-01-19',
-      lastOutboundDate: '2024-01-24',
-    },
-  ]);
+  const [stockStatuses, setStockStatuses] = useState<Inventory[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('전체');
+
+  useEffect(() => {
+    fetchStockStatuses();
+  }, []);
+
+  const fetchStockStatuses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await inventoryApi.findAll();
+      setStockStatuses(data);
+    } catch (err) {
+      setError('재고현황을 불러오는데 실패했습니다.');
+      console.error('Failed to fetch stock statuses:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredStatuses = stockStatuses.filter((status) => {
     const matchesSearch =
       status.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       status.itemName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === '전체' || status.stockStatus === filterStatus;
+    const stockStatus = getStockStatus(status.currentStock, status.safeStock);
+    const matchesFilter = filterStatus === '전체' || stockStatus === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
@@ -95,6 +43,16 @@ const StatusPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-md">
+          처리 중...
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-slate-700 text-3xl font-bold">재고현황</h1>
         <div className="flex gap-3">
