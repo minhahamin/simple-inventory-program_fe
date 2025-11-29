@@ -4,6 +4,7 @@ import DataTable from '../components/DataTable';
 import DatePicker from '../components/DatePicker';
 import ConfirmModal from '../components/ConfirmModal';
 import { inboundApi, Inbound, CreateInboundDto, UpdateInboundDto } from '../api/inboundApi';
+import { itemsApi, Item } from '../api/itemsApi';
 
 const InboundPage: React.FC = () => {
   const [inbounds, setInbounds] = useState<Inbound[]>([]);
@@ -15,6 +16,9 @@ const InboundPage: React.FC = () => {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+  const [items, setItems] = useState<Item[]>([]);
+  const [itemSearchTerm, setItemSearchTerm] = useState('');
   const [formData, setFormData] = useState<Omit<Inbound, 'id'>>({
     inboundDate: '',
     itemCode: '',
@@ -29,6 +33,12 @@ const InboundPage: React.FC = () => {
     fetchInbounds();
   }, []);
 
+  useEffect(() => {
+    if (isItemModalOpen) {
+      fetchItems();
+    }
+  }, [isItemModalOpen]);
+
   const fetchInbounds = async () => {
     try {
       setLoading(true);
@@ -42,6 +52,32 @@ const InboundPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const fetchItems = async () => {
+    try {
+      const data = await itemsApi.findAll();
+      setItems(data);
+    } catch (err) {
+      console.error('Failed to fetch items:', err);
+    }
+  };
+
+  const handleSelectItem = (item: Item) => {
+    setFormData((prev) => ({
+      ...prev,
+      itemCode: item.itemCode,
+      itemName: item.itemName,
+    }));
+    setIsItemModalOpen(false);
+    setItemSearchTerm('');
+  };
+
+  const filteredItems = items.filter((item) => {
+    return (
+      item.itemCode.toLowerCase().includes(itemSearchTerm.toLowerCase()) ||
+      item.itemName.toLowerCase().includes(itemSearchTerm.toLowerCase())
+    );
+  });
 
   const filteredInbounds = inbounds.filter((inbound) => {
     const matchesSearch =
@@ -331,15 +367,38 @@ const InboundPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     품목명 <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    name="itemName"
-                    value={formData.itemName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="품목명을 입력하세요"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="itemName"
+                      value={formData.itemName}
+                      onChange={handleInputChange}
+                      required
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="품목명을 입력하세요"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsItemModalOpen(true)}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors flex items-center gap-1"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                      검색
+                    </button>
+                  </div>
                 </div>
 
                 <div>
@@ -438,6 +497,90 @@ const InboundPage: React.FC = () => {
           setDeleteTargetId(null);
         }}
       />
+
+      {/* 품목 검색 모달 */}
+      <DraggableModal
+        isOpen={isItemModalOpen}
+        onClose={() => {
+          setIsItemModalOpen(false);
+          setItemSearchTerm('');
+        }}
+        title="품목 검색"
+        initialWidth={800}
+        initialHeight={600}
+      >
+        <div className="p-6">
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="품목코드 또는 품목명으로 검색..."
+              value={itemSearchTerm}
+              onChange={(e) => setItemSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="border border-gray-200 rounded-md overflow-hidden max-h-96 overflow-y-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 sticky top-0">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    품목코드
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    품목명
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    단가
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    단위
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    작업
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                      검색 결과가 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredItems.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-blue-50 transition-colors cursor-pointer"
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-blue-600">
+                        {item.itemCode}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                        {item.itemName}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                        {item.unitPrice.toLocaleString()}원
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                        {item.unit}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm">
+                        <button
+                          onClick={() => handleSelectItem(item)}
+                          className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+                        >
+                          선택
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </DraggableModal>
     </div>
   );
 };

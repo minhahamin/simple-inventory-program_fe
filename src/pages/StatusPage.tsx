@@ -27,6 +27,11 @@ const StatusPage: React.FC = () => {
     }
   };
 
+  const getStockStatus = (current: number, safe: number) => {
+    if (current > safe) return '안전';
+    return '부족';
+  };
+
   const filteredStatuses = stockStatuses.filter((status) => {
     const matchesSearch =
       status.itemCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -35,11 +40,6 @@ const StatusPage: React.FC = () => {
     const matchesFilter = filterStatus === '전체' || stockStatus === filterStatus;
     return matchesSearch && matchesFilter;
   });
-
-  const getStockStatus = (current: number, safe: number) => {
-    if (current > safe) return '안전';
-    return '부족';
-  };
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">

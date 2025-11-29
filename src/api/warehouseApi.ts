@@ -14,19 +14,15 @@ export interface Warehouse {
   warehouseCode: string;
   warehouseName: string;
   location: string;
-  capacity: number;
-  currentStock: number;
   manager: string;
   phone: string;
   description: string;
 }
 
 export interface CreateWarehouseDto {
-  warehouseCode: string;
+  warehouseCode?: string;
   warehouseName: string;
   location: string;
-  capacity: number;
-  currentStock: number;
   manager: string;
   phone: string;
   description?: string;
@@ -36,8 +32,6 @@ export interface UpdateWarehouseDto {
   warehouseCode?: string;
   warehouseName?: string;
   location?: string;
-  capacity?: number;
-  currentStock?: number;
   manager?: string;
   phone?: string;
   description?: string;

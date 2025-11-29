@@ -17,8 +17,6 @@ const WarehousePage: React.FC = () => {
     warehouseCode: '',
     warehouseName: '',
     location: '',
-    capacity: 0,
-    currentStock: 0,
     manager: '',
     phone: '',
     description: '',
@@ -64,8 +62,6 @@ const WarehousePage: React.FC = () => {
         warehouseCode: warehouse.warehouseCode,
         warehouseName: warehouse.warehouseName,
         location: warehouse.location,
-        capacity: warehouse.capacity,
-        currentStock: warehouse.currentStock,
         manager: warehouse.manager,
         phone: warehouse.phone,
         description: warehouse.description,
@@ -81,8 +77,6 @@ const WarehousePage: React.FC = () => {
       warehouseCode: '',
       warehouseName: '',
       location: '',
-      capacity: 0,
-      currentStock: 0,
       manager: '',
       phone: '',
       description: '',
@@ -93,7 +87,7 @@ const WarehousePage: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'capacity' || name === 'currentStock' ? parseFloat(value) || 0 : value,
+      [name]: value,
     }));
   };
 
@@ -108,8 +102,6 @@ const WarehousePage: React.FC = () => {
           warehouseCode: formData.warehouseCode,
           warehouseName: formData.warehouseName,
           location: formData.location,
-          capacity: formData.capacity,
-          currentStock: formData.currentStock,
           manager: formData.manager,
           phone: formData.phone,
           description: formData.description,
@@ -124,8 +116,6 @@ const WarehousePage: React.FC = () => {
           warehouseCode: formData.warehouseCode,
           warehouseName: formData.warehouseName,
           location: formData.location,
-          capacity: formData.capacity,
-          currentStock: formData.currentStock,
           manager: formData.manager,
           phone: formData.phone,
           description: formData.description,
@@ -165,11 +155,6 @@ const WarehousePage: React.FC = () => {
     setShowDeleteConfirm(false);
   };
 
-
-  const getUsageRate = (current: number, capacity: number) => {
-    if (capacity === 0) return 0;
-    return Math.round((current / capacity) * 100);
-  };
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-5">
@@ -237,40 +222,6 @@ const WarehousePage: React.FC = () => {
             ),
           },
           {
-            key: 'capacity',
-            label: '용량',
-            render: (item) => (
-              <span className="text-gray-700">{item.capacity.toLocaleString()}</span>
-            ),
-          },
-          {
-            key: 'currentStock',
-            label: '현재재고',
-            render: (item) => (
-              <span className="font-semibold text-gray-900">{item.currentStock.toLocaleString()}</span>
-            ),
-          },
-          {
-            key: 'usageRate',
-            label: '사용률',
-            render: (item) => {
-              const usageRate = getUsageRate(item.currentStock, item.capacity);
-              return (
-                <span
-                  className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    usageRate >= 90
-                      ? 'bg-red-100 text-red-800'
-                      : usageRate >= 70
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}
-                >
-                  {usageRate}%
-                </span>
-              );
-            },
-          },
-          {
             key: 'manager',
             label: '담당자',
             render: (item) => (
@@ -330,14 +281,13 @@ const WarehousePage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    창고코드 <span className="text-red-500">*</span>
+                    창고코드
                   </label>
                   <input
                     type="text"
                     name="warehouseCode"
                     value={formData.warehouseCode}
                     onChange={handleInputChange}
-                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="예: WH-001"
                   />
@@ -370,40 +320,6 @@ const WarehousePage: React.FC = () => {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="예: 서울시 강남구"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    용량 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="capacity"
-                    value={formData.capacity || ''}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    step="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    현재재고 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="currentStock"
-                    value={formData.currentStock || ''}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    step="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="0"
                   />
                 </div>
 
