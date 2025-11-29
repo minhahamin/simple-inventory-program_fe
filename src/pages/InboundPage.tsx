@@ -67,6 +67,7 @@ const InboundPage: React.FC = () => {
       ...prev,
       itemCode: item.itemCode,
       itemName: item.itemName,
+      unitPrice: item.unitPrice,
     }));
     setIsItemModalOpen(false);
     setItemSearchTerm('');
