@@ -222,9 +222,14 @@ const ItemsPage: React.FC = () => {
           {
             key: 'unitPrice',
             label: '단가',
-            render: (item) => (
-              <span className="text-gray-700 font-medium">{item.unitPrice.toLocaleString()}원</span>
-            ),
+            render: (item) => {
+              const price = typeof item.unitPrice === 'number' ? item.unitPrice : Number(item.unitPrice) || 0;
+              return (
+                <span className="text-gray-700 font-medium">
+                  {price.toLocaleString('ko-KR')}원
+                </span>
+              );
+            },
           },
           {
             key: 'unit',
